@@ -144,65 +144,65 @@ jobs:
             variant: builtin_wxwidgets
             build_dir: build_b
             artifact_prefix: pack_b_wxwidg
-            enable_wx: ON
-            system_wx: OFF
-            system_glfw: OFF
+            enable_wx: true
+            system_wx: false
+            system_glfw: false
           - os: windows-latest
             variant: system_wxwidgets
             build_dir: build_s
             artifact_prefix: pack_s_wxwidg
-            enable_wx: ON
-            system_wx: ON
-            system_glfw: OFF
+            enable_wx: true
+            system_wx: true
+            system_glfw: false
           - os: windows-latest
             variant: no_wxwidgets
             build_dir: build_n
             artifact_prefix: pack_n_wxwidg
-            enable_wx: OFF
-            system_wx: OFF
-            system_glfw: OFF
+            enable_wx: false
+            system_wx: false
+            system_glfw: false
           - os: ubuntu-latest
             variant: builtin_wxwidgets
             build_dir: build_b
             artifact_prefix: pack_b_wxwidg
-            enable_wx: ON
-            system_wx: OFF
-            system_glfw: OFF
+            enable_wx: true
+            system_wx: false
+            system_glfw: false
           - os: ubuntu-latest
             variant: system_wxwidgets
             build_dir: build_s
             artifact_prefix: pack_s_wxwidg
-            enable_wx: ON
-            system_wx: ON
-            system_glfw: OFF
+            enable_wx: true
+            system_wx: true
+            system_glfw: false
           - os: ubuntu-latest
             variant: no_wxwidgets
             build_dir: build_n
             artifact_prefix: pack_n_wxwidg
-            enable_wx: OFF
-            system_wx: OFF
-            system_glfw: OFF
+            enable_wx: false
+            system_wx: false
+            system_glfw: false
           - os: macos-latest
             variant: builtin_wxwidgets
             build_dir: build_b
             artifact_prefix: pack_b_wxwidg
-            enable_wx: ON
-            system_wx: OFF
-            system_glfw: OFF
+            enable_wx: true
+            system_wx: false
+            system_glfw: false
           - os: macos-latest
             variant: system_wxwidgets
             build_dir: build_s
             artifact_prefix: pack_s_wxwidg
-            enable_wx: ON
-            system_wx: ON
-            system_glfw: ON
+            enable_wx: true
+            system_wx: true
+            system_glfw: true
           - os: macos-latest
             variant: no_wxwidgets
             build_dir: build_n
             artifact_prefix: pack_n_wxwidg
-            enable_wx: OFF
-            system_wx: OFF
-            system_glfw: OFF
+            enable_wx: false
+            system_wx: false
+            system_glfw: false
 
     steps:
       - name: Checkout
