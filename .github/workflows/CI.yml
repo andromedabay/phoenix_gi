@@ -344,7 +344,7 @@ jobs:
           fi
           cmake "${args[@]}"
 
-       - name: Build
+      - name: Build
         if: runner.os == 'Windows'
         shell: pwsh
         env:
