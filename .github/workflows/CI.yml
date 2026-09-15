@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -206,7 +206,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -242,7 +242,8 @@ jobs:
       - name: Install System wxWidgets (Linux, system_wx)
         if: runner.os == 'Linux' && matrix.system_wx == true
         run: |
-          sudo apt-get install -y libwxbase3.2-dev libwxgtk3.2-dev wx-common
+          #sudo apt-get install -y libwxbase3.2-dev libwxgtk3.2-dev wx-common
+          sudo apt-get install -y libwxbase3.0-dev libwxgtk3.0-gtk3-dev wx-common
 
       - name: Verify wxWidgets Installation (Linux, system_wx)
         if: runner.os == 'Linux' && matrix.system_wx == true
@@ -281,7 +282,7 @@ jobs:
         shell: pwsh
         if: runner.os == 'Windows' && matrix.system_wx == true
         run: |
-          $prefix="C:\\wxWidgets-3.3.1"
+          $prefix="C:\\wxWidgets-3.3.1;C:\\ProgramData\\chocolatey\\lib\\wxWidgets\\tools;C:\\Program Files"
           if (  [String]::IsNullOrWhiteSpace($env:CMAKE_PREFIX_PATH) ) {
               Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_PREFIX_PATH=$prefix"
           }
@@ -319,7 +320,10 @@ jobs:
             "-DWXBGI_ENABLE_WX=$env:ENABLE_WX",
             "-DCMAKE_PREFIX_PATH=$env:CMAKE_PREFIX_PATH"
           )
-          if ($env:SYSTEM_WX -eq 'true') { $args += '-DWXBGI_SYSTEM_WX=ON' }
+          if ($env:SYSTEM_WX -eq 'true') {
+            $args += '-DWXBGI_SYSTEM_WX=ON'
+            $args += '-DwxWidgets_ROOT_DIR=C:\\wxWidgets-3.3.1'
+          }
           if ($env:SYSTEM_GLFW -eq 'true') { $args += '-DWXBGI_SYSTEM_GLFW=ON' }
           cmake @args
 
