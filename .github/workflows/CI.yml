@@ -282,11 +282,14 @@ jobs:
         shell: pwsh
         if: runner.os == 'Windows' && matrix.system_wx == true
         run: |
+          Write-Host "Install 7z"
+          choco install -y 7z
+        
           Write-Host "Downloading archive..."
           Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.1/wxWidgets-3.3.1-headers.7z" -OutFile "archive.7z"
           
           Write-Host "Extracting archive..."
-          Expand-Archive -Path "archive.7z" -DestinationPath "C:\\wxWidgets-3.3.1\\Include\\" -Force
+          7z x "archive.7z" -o"C:\\wxWidgets-3.3.1\\Include\\" -y
           
           Write-Host "Cleaning up..."
           Remove-Item "archive.7z"
