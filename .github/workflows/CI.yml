@@ -278,11 +278,27 @@ jobs:
               Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_PREFIX_PATH=$newPath"
           }
 
+      - name: Maually Download Header Files (Windows, system_wx)
+        shell: pwsh
+        if: runner.os == 'Windows' && matrix.system_wx == true
+        run: |
+          Write-Host "Downloading archive..."
+          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.1/wxWidgets-3.3.1-headers.7z" -OutFile "archive.7z"
+          
+          Write-Host "Extracting archive..."
+          Expand-Archive -Path "archive.7z" -DestinationPath "C:\\wxWidgets-3.3.1\\Include\\" -Force
+          
+          Write-Host "Cleaning up..."
+          Remove-Item "archive.7z"
+          
+          Write-Host "Listing extracted files:"
+          Get-ChildItem -Path "C:\\wxWidgets-3.3.1\\Include\\" -Recurse
+
       - name: Set CMAKE_PREFIX_PATH (Windows, system_wx)
         shell: pwsh
         if: runner.os == 'Windows' && matrix.system_wx == true
         run: |
-          $prefix="C:\\wxWidgets-3.3.1;C:\\ProgramData\\chocolatey\\lib\\wxWidgets\\tools;C:\\Program Files"
+          $prefix="C:\\wxWidgets-3.3.1;C:\\wxWidgets-3.3.1\\Include;C:\\ProgramData\\chocolatey\\lib\\wxWidgets\\tools;C:\\Program Files"
           if (  [String]::IsNullOrWhiteSpace($env:CMAKE_PREFIX_PATH) ) {
               Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_PREFIX_PATH=$prefix"
           }
