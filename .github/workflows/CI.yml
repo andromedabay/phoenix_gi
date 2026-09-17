@@ -292,7 +292,7 @@ jobs:
           Remove-Item "archive.7z"
           
           Write-Host "Listing extracted files:"
-          Get-ChildItem -Path "C:\\wxWidgets-3.3.1\\Include\\" -Recurse
+          dir "C:\\wxWidgets-3.3.1\\Include\\"
 
       - name: Set CMAKE_PREFIX_PATH (Windows, system_wx)
         shell: pwsh
