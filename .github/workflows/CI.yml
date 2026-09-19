@@ -285,14 +285,14 @@ jobs:
           # Write-Host "Install 7z"
           # choco install -y 7z
         
-          Write-Host "Downloading archive..."
-          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.1/wxWidgets-3.3.1-headers.7z" -OutFile "archive.7z"
+          # Write-Host "Downloading archive..."
+          # Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.1/wxWidgets-3.3.1-headers.7z" -OutFile "archive.7z"
           
-          Write-Host "Extracting archive..."
-          7z x "archive.7z" -o"C:\\wxWidgets-3.3.1\\Include\\" -y
+          # Write-Host "Extracting archive..."
+          # 7z x "archive.7z" -o"C:\\wxWidgets-3.3.1\\Include\\" -y
           
-          Write-Host "Cleaning up..."
-          Remove-Item "archive.7z"
+          # Write-Host "Cleaning up..."
+          # Remove-Item "archive.7z"
           
           Write-Host "Listing extracted files:"
           dir "C:\\wxWidgets-3.3.1\\"
@@ -342,8 +342,9 @@ jobs:
           if ($env:SYSTEM_WX -eq 'true') {
             $args += '-DWXBGI_SYSTEM_WX=ON'
             $args += '-DwxWidgets_ROOT_DIR=C:\\wxWidgets-3.3.1'
-            $args += '-DwxWidgets_INCLUDE_DIRS=C:\\wxWidgets-3.3.1\\Include'
+            $args += '-DwxWidgets_INCLUDE_DIRS=C:\\wxWidgets-3.3.1\\include'
             $args += '-DwxWidgets_LIB_DIR=C:\\wxWidgets-3.3.1\\lib'
+            $args += '-DwxWidgets_LIBRARIES=C:\\wxWidgets-3.3.1\\lib'
           }
           if ($env:SYSTEM_GLFW -eq 'true') { $args += '-DWXBGI_SYSTEM_GLFW=ON' }
           cmake @args
