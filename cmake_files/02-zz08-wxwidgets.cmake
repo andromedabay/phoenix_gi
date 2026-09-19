@@ -26,20 +26,22 @@ Enable on Linux/macOS CI after installing libwxgtk3.2-dev / brew wxwidgets."
     add_library(wx_bgi_wx_iface INTERFACE)
 
     if(WXBGI_SYSTEM_WX)
-        message(STATUS "Using system wxWidgets (find_package)...")
-        find_package(wxWidgets 3.0 REQUIRED COMPONENTS core gl base)
+        # message(STATUS "Using system wxWidgets (find_package)...")
+        # find_package(wxWidgets 3.0 REQUIRED COMPONENTS core gl base)
 
-        # Propagate all flags through the interface target without using the
-        # legacy wxWidgets_USE_FILE (which pollutes directory-level settings).
-        target_link_libraries(wx_bgi_wx_iface INTERFACE ${wxWidgets_LIBRARIES})
-        target_include_directories(wx_bgi_wx_iface INTERFACE ${wxWidgets_INCLUDE_DIRS})
-        if(wxWidgets_CXX_FLAGS)
-            separate_arguments(_wx_cxx_flags UNIX_COMMAND "${wxWidgets_CXX_FLAGS}")
-            target_compile_options(wx_bgi_wx_iface INTERFACE ${_wx_cxx_flags})
-        endif()
-        if(wxWidgets_DEFINITIONS)
-            target_compile_definitions(wx_bgi_wx_iface INTERFACE ${wxWidgets_DEFINITIONS})
-        endif()
+        # # Propagate all flags through the interface target without using the
+        # # legacy wxWidgets_USE_FILE (which pollutes directory-level settings).
+        # target_link_libraries(wx_bgi_wx_iface INTERFACE ${wxWidgets_LIBRARIES})
+        # target_include_directories(wx_bgi_wx_iface INTERFACE ${wxWidgets_INCLUDE_DIRS})
+        # if(wxWidgets_CXX_FLAGS)
+        #     separate_arguments(_wx_cxx_flags UNIX_COMMAND "${wxWidgets_CXX_FLAGS}")
+        #     target_compile_options(wx_bgi_wx_iface INTERFACE ${_wx_cxx_flags})
+        # endif()
+        # if(wxWidgets_DEFINITIONS)
+        #     target_compile_definitions(wx_bgi_wx_iface INTERFACE ${wxWidgets_DEFINITIONS})
+        # endif()
+        message(STATUS "Going to use Kitware provided FindwxWidgets.cmake script....")
+        include(02-zz08-z2-FindwxWidgets.cmake)
     else()
         message(STATUS "Fetching wxWidgets ${GIT_TAG_WXWIDGETS} ...")
 
