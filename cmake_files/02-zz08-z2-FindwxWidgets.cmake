@@ -1185,13 +1185,24 @@ find_package_handle_standard_args(wxWidgets
   )
 unset(wxWidgets_HANDLE_COMPONENTS)
 
-if(wxWidgets_FOUND AND NOT TARGET wxWidgets::wxWidgets)
-  add_library(wxWidgets::wxWidgets INTERFACE IMPORTED)
-  target_link_libraries(wxWidgets::wxWidgets INTERFACE ${wxWidgets_LIBRARIES})
-  target_link_directories(wxWidgets::wxWidgets INTERFACE ${wxWidgets_LIBRARY_DIRS})
-  target_include_directories(wxWidgets::wxWidgets INTERFACE ${wxWidgets_INCLUDE_DIRS})
-  target_compile_options(wxWidgets::wxWidgets INTERFACE ${wxWidgets_CXX_FLAGS})
-  target_compile_definitions(wxWidgets::wxWidgets INTERFACE ${wxWidgets_DEFINITIONS})
+# if(wxWidgets_FOUND AND NOT TARGET wxWidgets::wxWidgets)
+#   add_library(wxWidgets::wxWidgets INTERFACE IMPORTED)
+#   target_link_libraries(wxWidgets::wxWidgets INTERFACE ${wxWidgets_LIBRARIES})
+#   target_link_directories(wxWidgets::wxWidgets INTERFACE ${wxWidgets_LIBRARY_DIRS})
+#   target_include_directories(wxWidgets::wxWidgets INTERFACE ${wxWidgets_INCLUDE_DIRS})
+#   target_compile_options(wxWidgets::wxWidgets INTERFACE ${wxWidgets_CXX_FLAGS})
+#   target_compile_definitions(wxWidgets::wxWidgets INTERFACE ${wxWidgets_DEFINITIONS})
+#   # FIXME: Add "$<$<CONFIG:Debug>:${wxWidgets_DEFINITIONS_DEBUG}>"
+#   # if the debug library variant is available.
+# endif()
+
+if(wxWidgets_FOUND AND TARGET wx_bgi_wx_iface)
+  # add_library(wxWidgets::wxWidgets INTERFACE IMPORTED)
+  target_link_libraries(wx_bgi_wx_iface INTERFACE ${wxWidgets_LIBRARIES})
+  target_link_directories(wx_bgi_wx_iface INTERFACE ${wxWidgets_LIBRARY_DIRS})
+  target_include_directories(wx_bgi_wx_iface INTERFACE ${wxWidgets_INCLUDE_DIRS})
+  target_compile_options(wx_bgi_wx_iface INTERFACE ${wxWidgets_CXX_FLAGS})
+  target_compile_definitions(wx_bgi_wx_iface INTERFACE ${wxWidgets_DEFINITIONS})
   # FIXME: Add "$<$<CONFIG:Debug>:${wxWidgets_DEFINITIONS_DEBUG}>"
   # if the debug library variant is available.
 endif()
