@@ -147,13 +147,13 @@ jobs:
             enable_wx: true
             system_wx: false
             system_glfw: false
-          - os: windows-latest
-            variant: system_wxwidgets
-            build_dir: build_s
-            artifact_prefix: pack_s_wxwidg
-            enable_wx: true
-            system_wx: true
-            system_glfw: false
+          # - os: windows-latest
+          #   variant: system_wxwidgets
+          #   build_dir: build_s
+          #   artifact_prefix: pack_s_wxwidg
+          #   enable_wx: true
+          #   system_wx: true
+          #   system_glfw: false
           - os: windows-latest
             variant: no_wxwidgets
             build_dir: build_n
@@ -168,13 +168,13 @@ jobs:
             enable_wx: true
             system_wx: false
             system_glfw: false
-          - os: ubuntu-latest
-            variant: system_wxwidgets
-            build_dir: build_s
-            artifact_prefix: pack_s_wxwidg
-            enable_wx: true
-            system_wx: true
-            system_glfw: false
+          # - os: ubuntu-latest
+          #   variant: system_wxwidgets
+          #   build_dir: build_s
+          #   artifact_prefix: pack_s_wxwidg
+          #   enable_wx: true
+          #   system_wx: true
+          #   system_glfw: false
           - os: ubuntu-latest
             variant: no_wxwidgets
             build_dir: build_n
@@ -189,13 +189,13 @@ jobs:
             enable_wx: true
             system_wx: false
             system_glfw: false
-          - os: macos-latest
-            variant: system_wxwidgets
-            build_dir: build_s
-            artifact_prefix: pack_s_wxwidg
-            enable_wx: true
-            system_wx: true
-            system_glfw: true
+          # - os: macos-latest
+          #   variant: system_wxwidgets
+          #   build_dir: build_s
+          #   artifact_prefix: pack_s_wxwidg
+          #   enable_wx: true
+          #   system_wx: true
+          #   system_glfw: true
           - os: macos-latest
             variant: no_wxwidgets
             build_dir: build_n
