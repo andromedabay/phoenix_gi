@@ -1,6 +1,7 @@
-# wx_BGI_Graphics
+# Phoenix_GI
+### wx_BGI_Graphics (Old Name of this software)
 
-`wx_BGI_Graphics` is a cross-platform shared library that keeps the classic
+`wx_BGI_Graphics` or `Phoenix_gi` is a cross-platform shared library that keeps the classic
 Borland BGI programming model usable on modern systems by implementing the API
 on top of OpenGL, GLFW, GLEW, and wxWidgets.
 
@@ -110,3 +111,10 @@ validation currently requires a Linux, macOS, or WSL-style toolchain.
 
 See **[ScreenShots.md](./docs/user-guide/ScreenShots.md)** for example output and reference
 images from the current demos.
+
+## Using the wxBGIGraphics/libphoenix_gi/phoenix_gi Library
+1. Since git tag v2.8 the package binary file has been renamed to "libphoenix_gi" or "phoenix_gi"
+2. On Linux, make sure the SharedLibrary Binary is in the default locations for shared libs or Update the following:
+    ```
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/my_library_folder/
+    ```

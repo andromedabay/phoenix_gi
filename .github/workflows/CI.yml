@@ -142,64 +142,64 @@ jobs:
         include:
           - os: windows-latest
             variant: builtin_wxwidgets
-            build_dir: build_b
-            artifact_prefix: pack_b_wxwidg
+            build_dir: build_builtin
+            artifact_prefix: pack_builtin_wxwidg
             enable_wx: true
             system_wx: false
             system_glfw: false
           # - os: windows-latest
           #   variant: system_wxwidgets
-          #   build_dir: build_s
-          #   artifact_prefix: pack_s_wxwidg
+          #   build_dir: build_system
+          #   artifact_prefix: pack_system_wxwidg
           #   enable_wx: true
           #   system_wx: true
           #   system_glfw: false
           - os: windows-latest
             variant: no_wxwidgets
-            build_dir: build_n
-            artifact_prefix: pack_n_wxwidg
+            build_dir: build_no
+            artifact_prefix: pack_no_wxwidg
             enable_wx: false
             system_wx: false
             system_glfw: false
           - os: ubuntu-latest
             variant: builtin_wxwidgets
-            build_dir: build_b
-            artifact_prefix: pack_b_wxwidg
+            build_dir: build_builtin
+            artifact_prefix: pack_builtin_wxwidg
             enable_wx: true
             system_wx: false
             system_glfw: false
           # - os: ubuntu-latest
           #   variant: system_wxwidgets
-          #   build_dir: build_s
-          #   artifact_prefix: pack_s_wxwidg
+          #   build_dir: build_system
+          #   artifact_prefix: pack_system_wxwidg
           #   enable_wx: true
           #   system_wx: true
           #   system_glfw: false
           - os: ubuntu-latest
             variant: no_wxwidgets
-            build_dir: build_n
-            artifact_prefix: pack_n_wxwidg
+            build_dir: build_no
+            artifact_prefix: pack_no_wxwidg
             enable_wx: false
             system_wx: false
             system_glfw: false
           - os: macos-latest
             variant: builtin_wxwidgets
-            build_dir: build_b
-            artifact_prefix: pack_b_wxwidg
+            build_dir: build_builtin
+            artifact_prefix: pack_builtin_wxwidg
             enable_wx: true
             system_wx: false
             system_glfw: false
           # - os: macos-latest
           #   variant: system_wxwidgets
-          #   build_dir: build_s
-          #   artifact_prefix: pack_s_wxwidg
+          #   build_dir: build_system
+          #   artifact_prefix: pack_system_wxwidg
           #   enable_wx: true
           #   system_wx: true
           #   system_glfw: true
           - os: macos-latest
             variant: no_wxwidgets
-            build_dir: build_n
-            artifact_prefix: pack_n_wxwidg
+            build_dir: build_no
+            artifact_prefix: pack_no_wxwidg
             enable_wx: false
             system_wx: false
             system_glfw: false
