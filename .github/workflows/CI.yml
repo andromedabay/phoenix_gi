@@ -356,6 +356,7 @@ jobs:
           ENABLE_WX: ${{ matrix.enable_wx }}
           SYSTEM_WX: ${{ matrix.system_wx }}
           SYSTEM_GLFW: ${{ matrix.system_glfw }}
+          CMAKE_BUILD_PARALLEL_LEVEL: 1
         run: |
           args=(-S . -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release -DWXBGI_ENABLE_TEST_SEAMS=OFF -DWXBGI_ENABLE_WX="$ENABLE_WX")
           if [ "$RUNNER_OS" = "Linux" ]; then
@@ -416,7 +417,7 @@ jobs:
         if: runner.os != 'Windows'
         env:
           BUILD_DIR: ${{ matrix.build_dir }}
-        run: cmake --build "$BUILD_DIR" -j --config Release
+        run: cmake --build "$BUILD_DIR" --config Release
 
       - name: Install Mesa software renderer (Windows)
         if: runner.os == 'Windows'
