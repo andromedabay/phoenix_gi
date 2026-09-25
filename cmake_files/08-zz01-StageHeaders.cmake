@@ -34,6 +34,10 @@ if(NOT DEFINED STB_SOURCE_ROOT)
     message(FATAL_ERROR "StageHeaders.cmake requires STB_SOURCE_ROOT")
 endif()
 
+if(NOT DEFINED WXWIDGETS_CONFIG_ROOT)
+    set(WXWIDGETS_CONFIG_ROOT "")
+endif()
+
 if(NOT DEFINED GLFW_STAGE_PREFIX)
     set(GLFW_STAGE_PREFIX "")
 endif()
@@ -149,5 +153,19 @@ wxbgi_stage_headers_from_root("${MANIFOLD_INCLUDE_ROOT}" "" "MANIFOLD")
 wxbgi_stage_headers_from_root("${NLOHMANN_JSON_INCLUDE_ROOT}" "" "NLOHMANN_JSON")
 wxbgi_stage_headers_from_root("${YAML_CPP_INCLUDE_ROOT}" "" "YAML_CPP")
 wxbgi_stage_headers_from_root("${STB_SOURCE_ROOT}" "stb" "STB")
+
+if(WXBGI_ENABLE_WX AND NOT WXWIDGETS_CONFIG_ROOT STREQUAL "")
+    if(NOT EXISTS "${WXWIDGETS_CONFIG_ROOT}/wx/setup.h")
+        message(FATAL_ERROR
+            "wxWidgets generated setup header was not found: ${WXWIDGETS_CONFIG_ROOT}/wx/setup.h")
+    endif()
+    file(MAKE_DIRECTORY "${HEADER_STAGING_DIR}/wx")
+    configure_file(
+        "${WXWIDGETS_CONFIG_ROOT}/wx/setup.h"
+        "${HEADER_STAGING_DIR}/wx/setup.h"
+        COPYONLY
+    )
+    message(STATUS "Header staging: wxWidgets generated configuration -> wx/setup.h")
+endif()
 
 message(STATUS "Header staging finished")

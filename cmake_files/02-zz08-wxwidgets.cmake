@@ -33,6 +33,24 @@ Enable on Linux/macOS CI after installing libwxgtk3.2-dev / brew wxwidgets."
         # legacy wxWidgets_USE_FILE (which pollutes directory-level settings).
         target_link_libraries(wx_bgi_wx_iface INTERFACE ${wxWidgets_LIBRARIES})
         target_include_directories(wx_bgi_wx_iface INTERFACE ${wxWidgets_INCLUDE_DIRS})
+        set(WXBGI_WXWIDGETS_INCLUDE_ROOT "")
+        set(WXBGI_WXWIDGETS_CONFIG_ROOT "")
+        foreach(_wx_include_dir IN LISTS wxWidgets_INCLUDE_DIRS)
+            if(EXISTS "${_wx_include_dir}/wx/version.h")
+                set(WXBGI_WXWIDGETS_INCLUDE_ROOT "${_wx_include_dir}")
+            endif()
+            if(EXISTS "${_wx_include_dir}/wx/setup.h")
+                set(WXBGI_WXWIDGETS_CONFIG_ROOT "${_wx_include_dir}")
+            endif()
+        endforeach()
+        if(WXBGI_WXWIDGETS_INCLUDE_ROOT STREQUAL "")
+            message(FATAL_ERROR
+                "System wxWidgets headers were not found in wxWidgets_INCLUDE_DIRS: ${wxWidgets_INCLUDE_DIRS}")
+        endif()
+        if(WXBGI_WXWIDGETS_CONFIG_ROOT STREQUAL "")
+            message(FATAL_ERROR
+                "System wxWidgets generated wx/setup.h was not found in wxWidgets_INCLUDE_DIRS: ${wxWidgets_INCLUDE_DIRS}")
+        endif()
         if(wxWidgets_CXX_FLAGS)
             separate_arguments(_wx_cxx_flags UNIX_COMMAND "${wxWidgets_CXX_FLAGS}")
             target_compile_options(wx_bgi_wx_iface INTERFACE ${_wx_cxx_flags})
@@ -129,6 +147,23 @@ Enable on Linux/macOS CI after installing libwxgtk3.2-dev / brew wxwidgets."
             ${_wxwidgets_effective_source_dir}/include
             ${wxwidgets_BINARY_DIR}/include
         )
+
+        file(GLOB _wxwidgets_config_roots LIST_DIRECTORIES true
+            "${wxwidgets_BINARY_DIR}/lib/wx/include/*")
+        set(WXBGI_WXWIDGETS_INCLUDE_ROOT "${_wxwidgets_effective_source_dir}/include")
+        set(WXBGI_WXWIDGETS_CONFIG_ROOT "")
+        foreach(_wx_config_root IN LISTS _wxwidgets_config_roots)
+            if(EXISTS "${_wx_config_root}/wx/setup.h")
+                set(WXBGI_WXWIDGETS_CONFIG_ROOT "${_wx_config_root}")
+                target_include_directories(wx_bgi_wx_iface INTERFACE
+                    "${_wx_config_root}")
+                break()
+            endif()
+        endforeach()
+        if(WXBGI_WXWIDGETS_CONFIG_ROOT STREQUAL "")
+            message(FATAL_ERROR
+                "Builtin wxWidgets generated wx/setup.h was not found under ${wxwidgets_BINARY_DIR}/lib/wx/include")
+        endif()
 
         include_directories(${glew_SOURCE_DIR}/include)
 
