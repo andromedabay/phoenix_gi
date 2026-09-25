@@ -155,13 +155,22 @@ wxbgi_stage_headers_from_root("${YAML_CPP_INCLUDE_ROOT}" "" "YAML_CPP")
 wxbgi_stage_headers_from_root("${STB_SOURCE_ROOT}" "stb" "STB")
 
 if(WXBGI_ENABLE_WX AND NOT WXWIDGETS_CONFIG_ROOT STREQUAL "")
-    if(NOT EXISTS "${WXWIDGETS_CONFIG_ROOT}/wx/setup.h")
+    set(_wx_setup_header "${WXWIDGETS_CONFIG_ROOT}/wx/setup.h")
+    if(NOT EXISTS "${_wx_setup_header}")
+        file(GLOB_RECURSE _wx_setup_headers LIST_DIRECTORIES false
+            "${WXWIDGETS_CONFIG_ROOT}/*/wx/setup.h")
+        list(LENGTH _wx_setup_headers _wx_setup_header_count)
+        if(_wx_setup_header_count GREATER 0)
+            list(GET _wx_setup_headers 0 _wx_setup_header)
+        endif()
+    endif()
+    if(NOT EXISTS "${_wx_setup_header}")
         message(FATAL_ERROR
-            "wxWidgets generated setup header was not found: ${WXWIDGETS_CONFIG_ROOT}/wx/setup.h")
+            "wxWidgets generated setup header was not found under: ${WXWIDGETS_CONFIG_ROOT}")
     endif()
     file(MAKE_DIRECTORY "${HEADER_STAGING_DIR}/wx")
     configure_file(
-        "${WXWIDGETS_CONFIG_ROOT}/wx/setup.h"
+        "${_wx_setup_header}"
         "${HEADER_STAGING_DIR}/wx/setup.h"
         COPYONLY
     )
