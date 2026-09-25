@@ -149,17 +149,8 @@ Enable on Linux/macOS CI after installing libwxgtk3.2-dev / brew wxwidgets."
         )
 
         set(WXBGI_WXWIDGETS_INCLUDE_ROOT "${_wxwidgets_effective_source_dir}/include")
-        # wxcore exposes the generated setup include directory through its
-        # public build interface. It may not exist until the first build,
-        # especially with the Windows multi-config generators, so do not test
-        # for wx/setup.h during configure.
-        get_target_property(_wxcore_include_dirs wxcore INTERFACE_INCLUDE_DIRECTORIES)
-        if(_wxcore_include_dirs)
-            target_include_directories(wx_bgi_wx_iface INTERFACE
-                ${_wxcore_include_dirs})
-        endif()
-
-        # Packaging searches this build tree after wxcore has generated setup.h.
+        # wxcore already propagates its generated setup include directory to
+        # consumers. Packaging searches this binary tree after wxcore has built.
         set(WXBGI_WXWIDGETS_CONFIG_ROOT "${wxwidgets_BINARY_DIR}")
 
         include_directories(${glew_SOURCE_DIR}/include)
