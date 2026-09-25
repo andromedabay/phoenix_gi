@@ -148,11 +148,19 @@ Enable on Linux/macOS CI after installing libwxgtk3.2-dev / brew wxwidgets."
             ${wxwidgets_BINARY_DIR}/include
         )
 
-        file(GLOB _wxwidgets_config_roots LIST_DIRECTORIES true
-            "${wxwidgets_BINARY_DIR}/lib/wx/include/*")
         set(WXBGI_WXWIDGETS_INCLUDE_ROOT "${_wxwidgets_effective_source_dir}/include")
         set(WXBGI_WXWIDGETS_CONFIG_ROOT "")
-        foreach(_wx_config_root IN LISTS _wxwidgets_config_roots)
+
+        # wxWidgets places the generated setup.h differently by platform and
+        # generator. On Unix it is normally under lib/wx/include, while the
+        # Windows CMake build may place it under the binary include tree.
+        file(GLOB_RECURSE _wxwidgets_setup_headers LIST_DIRECTORIES false
+            "${wxwidgets_BINARY_DIR}/*/wx/setup.h")
+        foreach(_wx_setup_header IN LISTS _wxwidgets_setup_headers)
+            get_filename_component(_wx_config_wx_dir
+                "${_wx_setup_header}" DIRECTORY)
+            get_filename_component(_wx_config_root
+                "${_wx_config_wx_dir}" DIRECTORY)
             if(EXISTS "${_wx_config_root}/wx/setup.h")
                 set(WXBGI_WXWIDGETS_CONFIG_ROOT "${_wx_config_root}")
                 target_include_directories(wx_bgi_wx_iface INTERFACE
@@ -162,7 +170,7 @@ Enable on Linux/macOS CI after installing libwxgtk3.2-dev / brew wxwidgets."
         endforeach()
         if(WXBGI_WXWIDGETS_CONFIG_ROOT STREQUAL "")
             message(FATAL_ERROR
-                "Builtin wxWidgets generated wx/setup.h was not found under ${wxwidgets_BINARY_DIR}/lib/wx/include")
+                "Builtin wxWidgets generated wx/setup.h was not found under ${wxwidgets_BINARY_DIR}")
         endif()
 
         include_directories(${glew_SOURCE_DIR}/include)
