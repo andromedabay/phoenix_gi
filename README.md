@@ -118,3 +118,4 @@ images from the current demos.
     ```
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/my_library_folder/
     ```
+3. Please refer to [https://github.com/andromedabay/CBlit_cad](https://github.com/andromedabay/CBlit_cad) on how to use this Phoenix_gi in your C/C++ program.

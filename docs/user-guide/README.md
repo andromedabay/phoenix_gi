@@ -32,6 +32,10 @@ This guide is for programmers who want to build, run, and use
 | **[Camera2D_Map.md](../developer-guide/Camera2D_Map.md)** | 2D plan-view camera controls and usage |
 | **[InputsProcessing.md](../developer-guide/InputsProcessing.md)** | Keyboard queue, input hooks, and event-processing behavior |
 
+## Working Example Applications
+### C/C++
+Please refer to [https://github.com/andromedabay/CBlit_cad](https://github.com/andromedabay/CBlit_cad) on how to use this Phoenix_gi in your C/C++ program.
+
 ## Related Guides
 
 - Return to the project README in the repository root
