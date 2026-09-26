@@ -504,10 +504,12 @@ jobs:
           BUILD_DIR: ${{ matrix.build_dir }}
         run: |
           $packageDir = Join-Path $env:BUILD_DIR 'artifacts\wxWidgets'
-          $configDir = Join-Path $packageDir 'lib\cmake\wxWidgets-3.3'
-          if (-not (Test-Path (Join-Path $configDir 'wxWidgetsConfig.cmake'))) {
-            throw "wxWidgets CMake package was not staged at $configDir"
+          $configFile = Get-ChildItem -Path $packageDir -Filter 'wxWidgetsConfig.cmake' -Recurse |
+            Select-Object -First 1
+          if (-not $configFile) {
+            throw "wxWidgets CMake package was not staged under $packageDir"
           }
+          $configDir = $configFile.DirectoryName
           cmake -S tests/package_consumer -B "$env:BUILD_DIR\wx-package-consumer" `
             "-DwxWidgets_DIR=$configDir"
           cmake --build "$env:BUILD_DIR\wx-package-consumer" --config Release
@@ -517,8 +519,12 @@ jobs:
         env:
           BUILD_DIR: ${{ matrix.build_dir }}
         run: |
-          config_dir="$BUILD_DIR/artifacts/wxWidgets/lib/cmake/wxWidgets-3.3"
-          test -f "$config_dir/wxWidgetsConfig.cmake"
+          config_file="$(find "$BUILD_DIR/artifacts/wxWidgets" -type f -name wxWidgetsConfig.cmake -print -quit)"
+          if [ -z "$config_file" ]; then
+            echo "wxWidgets CMake package was not staged under $BUILD_DIR/artifacts/wxWidgets" >&2
+            exit 1
+          fi
+          config_dir="$(dirname "$config_file")"
           cmake -S tests/package_consumer -B "$BUILD_DIR/wx-package-consumer" \
             -DwxWidgets_DIR="$config_dir" -DCMAKE_BUILD_TYPE=Release
           cmake --build "$BUILD_DIR/wx-package-consumer" --config Release

@@ -49,6 +49,9 @@ list(REMOVE_DUPLICATES WXBGI_PACKAGE_DEPENDENCIES)
 set(WXBGI_WXWIDGETS_INSTALL_COMMANDS)
 if(WXBGI_BUNDLE_WXWIDGETS)
     list(APPEND WXBGI_WXWIDGETS_INSTALL_COMMANDS
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:wxmono>"
+        "${WXBGI_LIB_DIR}"
         COMMAND ${CMAKE_COMMAND} --install "${wxwidgets_BINARY_DIR}"
                 --config "$<CONFIG>"
                 --prefix "${WXBGI_PACKAGE_ROOT}/wxWidgets"

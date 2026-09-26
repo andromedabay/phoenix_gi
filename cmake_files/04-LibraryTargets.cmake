@@ -181,6 +181,15 @@ if(WIN32)
     set_target_properties(${WXBGI_LIB_TARGET} PROPERTIES PREFIX "")
 endif()
 
+if(WXBGI_BUILD_SHARED AND WXBGI_BUNDLE_WXWIDGETS)
+    add_custom_command(TARGET ${WXBGI_LIB_TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:wxmono>"
+                "$<TARGET_FILE_DIR:${WXBGI_LIB_TARGET}>"
+        VERBATIM
+    )
+endif()
+
 if(WXBGI_ENABLE_WX)
     add_library(wx_bgi_wx STATIC src/wx_bgi/wx_bgi_canvas.cpp)
     target_include_directories(wx_bgi_wx
