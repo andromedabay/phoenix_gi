@@ -26,6 +26,9 @@ Enable on Linux/macOS CI after installing libwxgtk3.2-dev / brew wxwidgets."
     add_library(wx_bgi_wx_iface INTERFACE)
 
     if(WXBGI_SYSTEM_WX)
+        if(WXBGI_BUNDLE_WXWIDGETS)
+            message(FATAL_ERROR "WXBGI_BUNDLE_WXWIDGETS cannot be used with WXBGI_SYSTEM_WX")
+        endif()
         message(STATUS "Using system wxWidgets (find_package)...")
         find_package(wxWidgets 3.0 REQUIRED COMPONENTS core gl base)
 
@@ -74,13 +77,21 @@ Enable on Linux/macOS CI after installing libwxgtk3.2-dev / brew wxwidgets."
         # Keep FetchContent prefix metadata/stamps intact. Removing this tree can
         # invalidate generated populate stamp files in the current build dir.
 
-        set(wxBUILD_SHARED  OFF CACHE BOOL "" FORCE)
+        if(WXBGI_BUNDLE_WXWIDGETS)
+            set(wxBUILD_SHARED ON CACHE BOOL "" FORCE)
+            set(wxBUILD_MONOLITHIC ON CACHE BOOL "" FORCE)
+            set(wxBUILD_INSTALL ON CACHE BOOL "" FORCE)
+            set(wxBUILD_USE_STATIC_RUNTIME OFF CACHE BOOL "" FORCE)
+        else()
+            set(wxBUILD_SHARED OFF CACHE BOOL "" FORCE)
+            set(wxBUILD_MONOLITHIC OFF CACHE BOOL "" FORCE)
+        endif()
         set(wxBUILD_TESTS   OFF CACHE STRING "" FORCE)
         set(wxBUILD_SAMPLES OFF CACHE STRING "" FORCE)
         set(wxBUILD_DEMOS   OFF CACHE STRING "" FORCE)
         set(wxBUILD_STC    OFF CACHE BOOL "" FORCE)
         set(wxUSE_STC      OFF CACHE BOOL "" FORCE)
-        set(wxBUILD_INSTALL_LOCALE OFF CACHE BOOL "" FORCE)
+        set(wxBUILD_LOCALES OFF CACHE BOOL "" FORCE)
 
         if(APPLE)
             # wxWidgets 3.2.x bundles libpng which includes <fp.h>. That header was
@@ -137,7 +148,11 @@ Enable on Linux/macOS CI after installing libwxgtk3.2-dev / brew wxwidgets."
 
         add_subdirectory(${_wxwidgets_effective_source_dir} ${wxwidgets_BINARY_DIR})
 
-        target_link_libraries(wx_bgi_wx_iface INTERFACE wxcore wxgl wxbase)
+        if(WXBGI_BUNDLE_WXWIDGETS)
+            target_link_libraries(wx_bgi_wx_iface INTERFACE wxmono)
+        else()
+            target_link_libraries(wx_bgi_wx_iface INTERFACE wxcore wxgl wxbase)
+        endif()
 
         # Do not force a full wxWidgets install for the fetched build. The
         # install step tries to package locale files that are not generated in

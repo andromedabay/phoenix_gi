@@ -55,7 +55,11 @@ set(OPENLB_ROOT "" CACHE PATH "Path to a local OpenLB release tree (used only wh
 # Use static MSVC runtime on Windows (/MT or /MTd) so the binary
 # has no dependency on the MSVC Redistributable.
 if(MSVC)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    if(WXBGI_BUNDLE_WXWIDGETS)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    else()
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    endif()
 endif()
 
 # ---------------------------------------------------------------------------

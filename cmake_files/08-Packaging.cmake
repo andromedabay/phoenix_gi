@@ -32,10 +32,28 @@ file(MAKE_DIRECTORY
 set(WXBGI_PACKAGE_DEPENDENCIES
     phoenix_gi
 )
+if(WXBGI_BUNDLE_WXWIDGETS)
+    if(NOT TARGET wxmono)
+        message(FATAL_ERROR "wxWidgets bundle requested, but the wxmono target is missing")
+    endif()
+    if(NOT TARGET wxrc)
+        message(FATAL_ERROR "wxWidgets bundle requested, but the wxrc install target is missing")
+    endif()
+    list(APPEND WXBGI_PACKAGE_DEPENDENCIES wxmono wxrc)
+endif()
 if(WXBGI_INSTALL_DOCS AND TARGET api_docs)
     list(APPEND WXBGI_PACKAGE_DEPENDENCIES api_docs)
 endif()
 list(REMOVE_DUPLICATES WXBGI_PACKAGE_DEPENDENCIES)
+
+set(WXBGI_WXWIDGETS_INSTALL_COMMANDS)
+if(WXBGI_BUNDLE_WXWIDGETS)
+    list(APPEND WXBGI_WXWIDGETS_INSTALL_COMMANDS
+        COMMAND ${CMAKE_COMMAND} --install "${wxwidgets_BINARY_DIR}"
+                --config "$<CONFIG>"
+                --prefix "${WXBGI_PACKAGE_ROOT}/wxWidgets"
+    )
+endif()
 
 get_property(WXBGI_BUILD_TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
 set(WXBGI_PACKAGE_BIN_BUNDLE_TARGETS)
@@ -185,6 +203,7 @@ add_custom_command(
             ${CMAKE_COMMAND} -E tar "czf" "${WXBGI_HEADERS_TAR_GZ}" --format=gnutar -- .
         COMMAND ${CMAKE_COMMAND} -E echo "Packaging example, demo, and test binaries into ${WXBGI_BIN_DIR}"
         ${WXBGI_BIN_STAGE_COMMANDS}
+        ${WXBGI_WXWIDGETS_INSTALL_COMMANDS}
     COMMAND ${CMAKE_COMMAND} -E touch "${WXBGI_PACKAGE_STAMP}"
     DEPENDS ${WXBGI_PACKAGE_DEPENDENCIES}
     COMMENT "Packaging public headers, binaries, and docs into the build artifacts directory"

@@ -145,6 +145,7 @@ jobs:
             build_dir: build_builtin
             artifact_prefix: pack_builtin_wxwidg
             enable_wx: true
+            bundle_wx: true
             system_wx: false
             system_glfw: false
           # - os: windows-latest
@@ -159,6 +160,7 @@ jobs:
             build_dir: build_no
             artifact_prefix: pack_no_wxwidg
             enable_wx: false
+            bundle_wx: false
             system_wx: false
             system_glfw: false
           - os: ubuntu-latest
@@ -166,6 +168,7 @@ jobs:
             build_dir: build_builtin
             artifact_prefix: pack_builtin_wxwidg
             enable_wx: true
+            bundle_wx: true
             system_wx: false
             system_glfw: false
           # - os: ubuntu-latest
@@ -180,6 +183,7 @@ jobs:
             build_dir: build_no
             artifact_prefix: pack_no_wxwidg
             enable_wx: false
+            bundle_wx: false
             system_wx: false
             system_glfw: false
           - os: macos-latest
@@ -187,6 +191,7 @@ jobs:
             build_dir: build_builtin
             artifact_prefix: pack_builtin_wxwidg
             enable_wx: true
+            bundle_wx: true
             system_wx: false
             system_glfw: false
           # - os: macos-latest
@@ -201,6 +206,7 @@ jobs:
             build_dir: build_no
             artifact_prefix: pack_no_wxwidg
             enable_wx: false
+            bundle_wx: false
             system_wx: false
             system_glfw: false
 
@@ -329,6 +335,7 @@ jobs:
         env:
           BUILD_DIR: ${{ matrix.build_dir }}
           ENABLE_WX: ${{ matrix.enable_wx }}
+          BUNDLE_WX: ${{ matrix.bundle_wx }}
           SYSTEM_WX: ${{ matrix.system_wx }}
           SYSTEM_GLFW: ${{ matrix.system_glfw }}
         run: |
@@ -337,8 +344,13 @@ jobs:
             '-B', $env:BUILD_DIR,
             '-DWXBGI_ENABLE_TEST_SEAMS=OFF',
             "-DWXBGI_ENABLE_WX=$env:ENABLE_WX",
+            "-DWXBGI_BUNDLE_WXWIDGETS=$env:BUNDLE_WX",
             "-DCMAKE_PREFIX_PATH=$env:CMAKE_PREFIX_PATH"
           )
+          if ($env:BUNDLE_WX -eq 'true') {
+            $args += '-DWXBGI_INSTALL_HEADERS=OFF'
+            $args += '-DWXBGI_INSTALL_DOCS=OFF'
+          }
           if ($env:SYSTEM_WX -eq 'true') {
             $args += '-DWXBGI_SYSTEM_WX=ON'
             $args += '-DwxWidgets_ROOT_DIR=C:\\wxWidgets-3.3.1'
@@ -354,11 +366,15 @@ jobs:
         env:
           BUILD_DIR: ${{ matrix.build_dir }}
           ENABLE_WX: ${{ matrix.enable_wx }}
+          BUNDLE_WX: ${{ matrix.bundle_wx }}
           SYSTEM_WX: ${{ matrix.system_wx }}
           SYSTEM_GLFW: ${{ matrix.system_glfw }}
           CMAKE_BUILD_PARALLEL_LEVEL: 1
         run: |
-          args=(-S . -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release -DWXBGI_ENABLE_TEST_SEAMS=OFF -DWXBGI_ENABLE_WX="$ENABLE_WX")
+          args=(-S . -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release -DWXBGI_ENABLE_TEST_SEAMS=OFF -DWXBGI_ENABLE_WX="$ENABLE_WX" -DWXBGI_BUNDLE_WXWIDGETS="$BUNDLE_WX")
+          if [ "$BUNDLE_WX" = "true" ]; then
+            args+=(-DWXBGI_INSTALL_HEADERS=OFF -DWXBGI_INSTALL_DOCS=OFF)
+          fi
           if [ "$RUNNER_OS" = "Linux" ]; then
             args+=(-DGLFW_BUILD_WAYLAND=OFF)
           fi
@@ -480,6 +496,32 @@ jobs:
         env:
           BUILD_DIR: ${{ matrix.build_dir }}
         run: cmake --build "$BUILD_DIR" --target wx_bgi_headers_package -j
+
+      - name: Verify bundled wxWidgets package (Windows)
+        if: runner.os == 'Windows' && matrix.bundle_wx == true
+        shell: pwsh
+        env:
+          BUILD_DIR: ${{ matrix.build_dir }}
+        run: |
+          $packageDir = Join-Path $env:BUILD_DIR 'artifacts\wxWidgets'
+          $configDir = Join-Path $packageDir 'lib\cmake\wxWidgets-3.3'
+          if (-not (Test-Path (Join-Path $configDir 'wxWidgetsConfig.cmake'))) {
+            throw "wxWidgets CMake package was not staged at $configDir"
+          }
+          cmake -S tests/package_consumer -B "$env:BUILD_DIR\wx-package-consumer" `
+            "-DwxWidgets_DIR=$configDir"
+          cmake --build "$env:BUILD_DIR\wx-package-consumer" --config Release
+
+      - name: Verify bundled wxWidgets package (Linux/macOS)
+        if: runner.os != 'Windows' && matrix.bundle_wx == true
+        env:
+          BUILD_DIR: ${{ matrix.build_dir }}
+        run: |
+          config_dir="$BUILD_DIR/artifacts/wxWidgets/lib/cmake/wxWidgets-3.3"
+          test -f "$config_dir/wxWidgetsConfig.cmake"
+          cmake -S tests/package_consumer -B "$BUILD_DIR/wx-package-consumer" \
+            -DwxWidgets_DIR="$config_dir" -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$BUILD_DIR/wx-package-consumer" --config Release
 
       - name: Archive build artifacts
         if: runner.os == 'Windows'

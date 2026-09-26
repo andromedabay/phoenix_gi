@@ -108,6 +108,12 @@ endif()
 
 set(WXBGI_LIB_TARGET phoenix_gi)
 
+if(MSVC AND WXBGI_BUNDLE_WXWIDGETS)
+    set(_wxbgi_msvc_runtime "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+else()
+    set(_wxbgi_msvc_runtime "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 if(WXBGI_BUILD_SHARED)
     add_library(${WXBGI_LIB_TARGET} SHARED ${SRCS})
 else()
@@ -121,7 +127,7 @@ set_target_properties(${WXBGI_LIB_TARGET} PROPERTIES
     EXPORT_NAME "phoenix_gi"
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+    MSVC_RUNTIME_LIBRARY "${_wxbgi_msvc_runtime}"
 )
 
 if(APPLE AND WXBGI_BUILD_SHARED)
@@ -183,7 +189,7 @@ if(WXBGI_ENABLE_WX)
     target_compile_definitions(wx_bgi_wx PUBLIC WXBGI_ENABLE_WX GLEW_STATIC)
     target_link_libraries(wx_bgi_wx PUBLIC ${WXBGI_LIB_TARGET} GLEW::GLEW wx_bgi_wx_iface)
     set_target_properties(wx_bgi_wx PROPERTIES
-        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+        MSVC_RUNTIME_LIBRARY "${_wxbgi_msvc_runtime}")
 endif()
 
 if(WXBGI_INSTALL_HEADERS)
