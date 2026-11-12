@@ -68,16 +68,17 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           # pal1000/mesa-dist-win provides Mesa3D for Windows (llvmpipe/gallium-d3d12).
+          # Pin 25.3.6 because newer releases no longer include the OpenGL opengl32.dll.
           # Placing its DLLs next to the library/test binary gives GLFW a real OpenGL
           # 2.1 driver that the Windows GDI stub cannot provide on headless CI VMs.
           $rel = Invoke-RestMethod `
-            'https://api.github.com/repos/pal1000/mesa-dist-win/releases/latest' `
+            'https://api.github.com/repos/pal1000/mesa-dist-win/releases/tags/25.3.6' `
             -Headers @{ Authorization = "Bearer $env:GITHUB_TOKEN"; 'User-Agent' = 'gh-actions' }
           $asset = $rel.assets |
-            Where-Object { $_.name -match 'release-msvc\.7z$' } |
+            Where-Object { $_.name -eq 'mesa3d-25.3.6-release-msvc.7z' } |
             Sort-Object name |
             Select-Object -First 1
-          if (-not $asset) { throw 'Mesa release-msvc.7z asset not found in latest mesa-dist-win release' }
+          if (-not $asset) { throw 'Mesa 25.3.6 release-msvc.7z asset not found' }
           Invoke-WebRequest $asset.browser_download_url -OutFile mesa.7z
           7z x mesa.7z -omesa -y | Out-Null
           $mesaDir = (Get-ChildItem mesa -Recurse -Filter 'opengl32.dll' |
@@ -443,13 +444,13 @@ jobs:
           BUILD_DIR: ${{ matrix.build_dir }}
         run: |
           $rel = Invoke-RestMethod `
-            'https://api.github.com/repos/pal1000/mesa-dist-win/releases/latest' `
+            'https://api.github.com/repos/pal1000/mesa-dist-win/releases/tags/25.3.6' `
             -Headers @{ Authorization = "Bearer $env:GITHUB_TOKEN"; 'User-Agent' = 'gh-actions' }
           $asset = $rel.assets |
-            Where-Object { $_.name -match 'release-msvc\.7z$' } |
+            Where-Object { $_.name -eq 'mesa3d-25.3.6-release-msvc.7z' } |
             Sort-Object name |
             Select-Object -First 1
-          if (-not $asset) { throw 'Mesa release-msvc.7z asset not found in latest mesa-dist-win release' }
+          if (-not $asset) { throw 'Mesa 25.3.6 release-msvc.7z asset not found' }
           Invoke-WebRequest $asset.browser_download_url -OutFile mesa.7z
           7z x mesa.7z -omesa -y | Out-Null
           $mesaDir = (Get-ChildItem mesa -Recurse -Filter 'opengl32.dll' |
