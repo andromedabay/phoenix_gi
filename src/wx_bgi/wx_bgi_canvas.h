@@ -100,7 +100,7 @@ public:
      *
      * @param evt The paint event.
      */
-    void OnPaint(wxPaintEvent& evt);
+    virtual void OnPaint(wxPaintEvent& evt);
 
     /**
      * @brief Handles resize events for the canvas.
@@ -112,7 +112,7 @@ public:
      *
      * @param evt The size event containing the new dimensions.
      */
-    void OnSize(wxSizeEvent& evt);
+    virtual void OnSize(wxSizeEvent& evt);
 
     /**
      * @brief Handles idle events for auto-refresh.
@@ -124,7 +124,7 @@ public:
      *
      * @param evt The idle event.
      */
-    void OnIdle(wxIdleEvent& evt);
+    virtual void OnIdle(wxIdleEvent& evt);
 
     /**
      * @brief Handles key press events.
@@ -136,7 +136,7 @@ public:
      *
      * @param evt Key event containing the key press information.
      */
-    void OnKeyDown(wxKeyEvent& evt);
+    virtual void OnKeyDown(wxKeyEvent& evt);
 
     /**
      * @brief Handles key release events.
@@ -148,7 +148,7 @@ public:
      *
      * @param evt Key event containing the key release information.
      */
-    void OnKeyUp(wxKeyEvent& evt);
+    virtual void OnKeyUp(wxKeyEvent& evt);
 
     /**
      * @brief Handles character input events.
@@ -160,7 +160,7 @@ public:
      *
      * @param evt Key event containing the character input information.
      */
-    void OnChar(wxKeyEvent& evt);
+    virtual void OnChar(wxKeyEvent& evt);
 
     /**
      * @brief Handles mouse movement over the canvas.
@@ -172,7 +172,7 @@ public:
      *
      * @param evt Mouse event containing the pointer position.
      */
-    void OnMouseMove(wxMouseEvent& evt);
+    virtual void OnMouseMove(wxMouseEvent& evt);
 
     /**
      * @brief Handles mouse button press events.
@@ -184,7 +184,7 @@ public:
      *
      * @param evt Mouse event containing the button press information.
      */
-    void OnMouseDown(wxMouseEvent& evt);
+    virtual void OnMouseDown(wxMouseEvent& evt);
 
     /**
      * @brief Handles mouse button release events.
@@ -196,7 +196,7 @@ public:
      *
      * @param evt Mouse event containing the button release information.
      */
-    void OnMouseUp(wxMouseEvent& evt);
+    virtual void OnMouseUp(wxMouseEvent& evt);
 
     /**
      * @brief Handles mouse wheel events.
@@ -208,7 +208,7 @@ public:
      *
      * @param evt Mouse event containing the wheel rotation information.
      */
-    void OnMouseWheel(wxMouseEvent& evt);
+    virtual void OnMouseWheel(wxMouseEvent& evt);
 
 private:
     static int WxKeyToGlfw(int wxKey);
