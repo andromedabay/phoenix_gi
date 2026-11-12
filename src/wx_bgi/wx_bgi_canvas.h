@@ -90,6 +90,7 @@ private:
     int          m_autoRefreshHz{0};
     wxLongLong_t m_lastRenderMs{0};
 
+public:
     void OnPaint(wxPaintEvent& evt);
     void OnSize(wxSizeEvent& evt);
     void OnIdle(wxIdleEvent& evt);
@@ -101,6 +102,7 @@ private:
     void OnMouseUp(wxMouseEvent& evt);
     void OnMouseWheel(wxMouseEvent& evt);
 
+private:
     static int WxKeyToGlfw(int wxKey);
     void       RouteKeyEvent(wxKeyEvent& evt, int action);
 };
