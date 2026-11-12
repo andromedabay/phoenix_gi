@@ -146,8 +146,14 @@ ctest --test-dir build-test -C Debug -N
 
 Linux:
 
+If executin on a Linux system via SSH or remote session:
 ```bash
 xvfb-run -a ctest --test-dir build-test --output-on-failure --timeout 90
+```
+
+If executing a Linux system with Desktop (GUI) available:
+```bash
+ctest --test-dir build-test --output-on-failure --timeout 90
 ```
 
 macOS (headless CI runners):
