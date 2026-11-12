@@ -91,19 +91,137 @@ private:
     wxLongLong_t m_lastRenderMs{0};
 
 public:
+    /**
+     * @brief Handles paint events for the canvas.
+     *
+     * This method is called when the canvas needs to be repainted. It creates a
+     * wxPaintDC to prepare for drawing and then calls the Render() method to
+     * perform the actual rendering of the BGI buffer onto the canvas.
+     *
+     * @param evt The paint event.
+     */
     void OnPaint(wxPaintEvent& evt);
+
+    /**
+     * @brief Handles resize events for the canvas.
+     *
+     * When the canvas is resized, this method checks if the BGI pixel buffer needs
+     * to be resized. If the new size is different from the current size, it calls
+     * wxbgi_wx_resize() to adjust the BGI buffer accordingly. Finally, it triggers
+     * a refresh of the canvas to ensure the new size is rendered.
+     *
+     * @param evt The size event containing the new dimensions.
+     */
     void OnSize(wxSizeEvent& evt);
+
+    /**
+     * @brief Handles idle events for auto-refresh.
+     *
+     * If auto-refresh is enabled, this method checks if enough time has passed
+     * since the last render to meet the target refresh rate. If so, it triggers
+     * a refresh of the canvas. This method is called during idle time when the
+     * application is not processing other events.
+     *
+     * @param evt The idle event.
+     */
     void OnIdle(wxIdleEvent& evt);
+
+    /**
+     * @brief Handles key press events.
+     *
+     * Forwards the key press to the BGI key handler, then allows wxWidgets to
+     * continue processing the event. Override this method in subclasses to implement
+     * custom key press behavior. Remember to call the base class implementation if
+     * you want to preserve the default behavior also.
+     *
+     * @param evt Key event containing the key press information.
+     */
     void OnKeyDown(wxKeyEvent& evt);
+
+    /**
+     * @brief Handles key release events.
+     *
+     * Forwards the key release to the BGI key handler, then allows wxWidgets to
+     * continue processing the event. Override this method in subclasses to implement
+     * custom key release behavior. Remember to call the base class implementation if
+     * you want to preserve the default behavior also.
+     *
+     * @param evt Key event containing the key release information.
+     */
     void OnKeyUp(wxKeyEvent& evt);
+
+    /**
+     * @brief Handles character input events.
+     *
+     * Forwards the Unicode code point of the character to the BGI character handler,
+     * then allows wxWidgets to continue processing the event. Override this method
+     * in subclasses to implement custom character input behavior. Remember to call
+     * the base class implementation if you want to preserve the default behavior also.
+     *
+     * @param evt Key event containing the character input information.
+     */
     void OnChar(wxKeyEvent& evt);
+
+    /**
+     * @brief Handles mouse movement over the canvas.
+     *
+     * Forwards the canvas-relative mouse coordinates to the BGI mouse handler,
+     * then allows wxWidgets to continue processing the event. Override this method
+     * in subclasses to implement custom mouse behavior. Remember to call the base class
+     * implementation if you want to preserve the default behavior also.
+     *
+     * @param evt Mouse event containing the pointer position.
+     */
     void OnMouseMove(wxMouseEvent& evt);
+
+    /**
+     * @brief Handles mouse button press events.
+     *
+     * Forwards the button press to the BGI mouse handler, then allows wxWidgets to
+     * continue processing the event. Override this method in subclasses to implement
+     * custom mouse button behavior. Remember to call the base class implementation if
+     * you want to preserve the default behavior also.
+     *
+     * @param evt Mouse event containing the button press information.
+     */
     void OnMouseDown(wxMouseEvent& evt);
+
+    /**
+     * @brief Handles mouse button release events.
+     *
+     * Forwards the button release to the BGI mouse handler, then allows wxWidgets to
+     * continue processing the event. Override this method in subclasses to implement
+     * custom mouse button behavior. Remember to call the base class implementation if
+     * you want to preserve the default behavior also.
+     *
+     * @param evt Mouse event containing the button release information.
+     */
     void OnMouseUp(wxMouseEvent& evt);
+
+    /**
+     * @brief Handles mouse wheel events.
+     *
+     * Forwards the scroll delta to the BGI scroll handler, then allows wxWidgets to continue
+     *  processing the event. Override this method in subclasses to implement custom mouse
+     *  wheel behavior. Remember to call the base class implementation if you want
+     *  to preserve the default behavior also.
+     *
+     * @param evt Mouse event containing the wheel rotation information.
+     */
     void OnMouseWheel(wxMouseEvent& evt);
 
 private:
     static int WxKeyToGlfw(int wxKey);
+
+    /**
+     * @brief Routes key events to the BGI key handler.
+     *
+     * Converts the wxWidgets key code to a GLFW key code and forwards the event
+     * to the BGI key handler. If the conversion fails, the event is skipped.
+     *
+     * @param evt The key event.
+     * @param action The action (press or release).
+     */
     void       RouteKeyEvent(wxKeyEvent& evt, int action);
 };
 
