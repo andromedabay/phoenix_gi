@@ -42,6 +42,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "bgi_camera.h"
 #include "bgi_dds.h"
@@ -1858,7 +1859,43 @@ void renderSetOperation(const bgi::Camera3D &cam,
     if (operands.empty())
         return;
 
-    if (renderExactSetOperation3D(cam, scene, obj, transform, colorOverride))
+    const auto hasHiddenSubtree = [&](const auto &self, const bgi::DdsObject &node,
+                                      std::unordered_set<std::string> &visited) -> bool {
+        if (!node.visible || !scene.layerVisible(node.layerName))
+            return true;
+        if (!node.id.empty() && !visited.insert(node.id).second)
+            return false;
+        const auto *children = childIds(node);
+        if (children)
+        {
+            for (const auto &childId : *children)
+            {
+                auto child = scene.findById(childId);
+                if (child && self(self, *child, visited))
+                {
+                    if (!node.id.empty())
+                        visited.erase(node.id);
+                    return true;
+                }
+            }
+        }
+        if (!node.id.empty())
+            visited.erase(node.id);
+        return false;
+    };
+    std::unordered_set<std::string> visibilityVisiting;
+    bool allVisible = !hasHiddenSubtree(hasHiddenSubtree, obj, visibilityVisiting);
+    for (const auto &childId : operands)
+    {
+        auto child = scene.findById(childId);
+        if (child && hasHiddenSubtree(hasHiddenSubtree, *child, visibilityVisiting))
+        {
+            allVisible = false;
+            break;
+        }
+    }
+
+    if (allVisible && renderExactSetOperation3D(cam, scene, obj, transform, colorOverride))
         return;
 
     std::vector<std::uint8_t> combined;
@@ -1909,6 +1946,9 @@ void renderNodeRecursive(const bgi::Camera3D &cam,
                          const bgi::DdsStyle *styleOverride,
                          std::unordered_set<std::string> &visiting)
 {
+    if (!obj.visible || (!obj.id.empty() && !scene.layerVisible(obj.layerName)))
+        return;
+
     if (!obj.id.empty())
     {
         if (!visiting.insert(obj.id).second)
@@ -1954,6 +1994,50 @@ void renderNodeRecursive(const bgi::Camera3D &cam,
 }
 
 } // anonymous namespace
+
+namespace bgi
+{
+
+void renderDdsPreview(const DdsObject &obj, const glm::mat4 &transform)
+{
+    const auto camIt = gState.cameras.find(gState.activeCamera);
+    if (camIt == gState.cameras.end() || gState.dds == nullptr)
+        return;
+
+    const Camera3D &cam = camIt->second->camera;
+    const auto savedStyle = saveStyle();
+    std::unordered_set<std::string> visiting;
+    renderNodeRecursive(cam, *gState.dds, obj, transform, -1, nullptr, visiting);
+    restoreStyle(savedStyle);
+
+    gState.pendingOverlayCam = gState.activeCamera;
+    if (gState.wxEmbedded && gState.pendingGl.hasPending())
+    {
+        const float ar = (cam.vpW > 0 && cam.vpH > 0)
+            ? static_cast<float>(cam.vpW) / static_cast<float>(cam.vpH)
+            : ((gState.height > 0)
+               ? static_cast<float>(gState.width) / static_cast<float>(gState.height)
+               : 1.f);
+        const glm::mat4 vpMat = cameraProjMatrix(cam, ar) * cameraViewMatrix(cam);
+
+        PendingGlFrame frame;
+        frame.geometry = std::move(gState.pendingGl);
+        std::memcpy(frame.viewProj, glm::value_ptr(vpMat), 16 * sizeof(float));
+        frame.eyeX = cam.eyeX;
+        frame.eyeY = cam.eyeY;
+        frame.eyeZ = cam.eyeZ;
+        frame.light = gState.lightState;
+        frame.camVpX = cam.vpX;
+        frame.camVpY = cam.vpY;
+        frame.camVpW = cam.vpW;
+        frame.camVpH = cam.vpH;
+        gState.pendingGlQueue.push_back(std::move(frame));
+        gState.pendingGl.clear();
+    }
+    flushToScreen();
+}
+
+} // namespace bgi
 
 // =============================================================================
 // wxbgi_render_dds — public implementation  (replaces stub in bgi_dds_api.cpp)

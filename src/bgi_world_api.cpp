@@ -172,7 +172,7 @@ BGI_API int BGI_CALL wxbgi_ucs_to_screen(const char *ucsName, const char *camNam
 // wxbgi_world_point
 // =============================================================================
 
-BGI_API void BGI_CALL wxbgi_world_point(float x, float y, float z, int color)
+BGI_API void BGI_CALL wxbgi_world_point(float x, float y, float z, int color, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
 
@@ -190,7 +190,7 @@ BGI_API void BGI_CALL wxbgi_world_point(float x, float y, float z, int color)
         obj->coordSpace = bgi::CoordSpace::World3D;
         obj->pos   = {x, y, z};
         obj->color = bgi::normalizeColor(color);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::setPixelWithMode(vpX, vpY, bgi::normalizeColor(color), bgi::gState.writeMode);
     bgi::flushToScreen();
@@ -201,7 +201,8 @@ BGI_API void BGI_CALL wxbgi_world_point(float x, float y, float z, int color)
 // =============================================================================
 
 BGI_API void BGI_CALL wxbgi_world_line(float x1, float y1, float z1,
-                                        float x2, float y2, float z2)
+                                        float x2, float y2, float z2,
+                                        int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
 
@@ -221,7 +222,7 @@ BGI_API void BGI_CALL wxbgi_world_line(float x1, float y1, float z1,
         obj->coordSpace = bgi::CoordSpace::World3D;
         obj->p1    = {x1, y1, z1};
         obj->p2    = {x2, y2, z2};
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawLineInternal(vx1, vy1, vx2, vy2, bgi::gState.currentColor);
     bgi::flushToScreen();
@@ -231,7 +232,7 @@ BGI_API void BGI_CALL wxbgi_world_line(float x1, float y1, float z1,
 // wxbgi_world_circle
 // =============================================================================
 
-BGI_API void BGI_CALL wxbgi_world_circle(float cx, float cy, float cz, float radius)
+BGI_API void BGI_CALL wxbgi_world_circle(float cx, float cy, float cz, float radius, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
 
@@ -270,7 +271,7 @@ BGI_API void BGI_CALL wxbgi_world_circle(float cx, float cy, float cz, float rad
         obj->coordSpace = bgi::CoordSpace::World3D;
         obj->centre = {cx, cy, cz};
         obj->radius = radius;
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawCircleInternal(vpX, vpY, screenRadius, bgi::gState.currentColor);
     bgi::flushToScreen();
@@ -282,7 +283,8 @@ BGI_API void BGI_CALL wxbgi_world_circle(float cx, float cy, float cz, float rad
 
 BGI_API void BGI_CALL wxbgi_world_ellipse(float cx, float cy, float cz,
                                            float rx, float ry,
-                                           int startAngle, int endAngle)
+                                           int startAngle, int endAngle,
+                                           int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
 
@@ -316,7 +318,7 @@ BGI_API void BGI_CALL wxbgi_world_ellipse(float cx, float cy, float cz,
         obj->ry         = ry;
         obj->startAngle = float(startAngle);
         obj->endAngle   = float(endAngle);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawEllipseInternal(vpX, vpY, startAngle, endAngle,
                              screenRx, screenRy, bgi::gState.currentColor);
@@ -328,7 +330,8 @@ BGI_API void BGI_CALL wxbgi_world_ellipse(float cx, float cy, float cz,
 // =============================================================================
 
 BGI_API void BGI_CALL wxbgi_world_rectangle(float x1, float y1, float z1,
-                                             float x2, float y2, float z2)
+                                             float x2, float y2, float z2,
+                                             int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
 
@@ -350,7 +353,7 @@ BGI_API void BGI_CALL wxbgi_world_rectangle(float x1, float y1, float z1,
         obj->coordSpace = bgi::CoordSpace::World3D;
         obj->p1         = {x1, y1, z1};
         obj->p2         = {x2, y2, z2};
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
 
     // Screen-space bounding box of the two projected corners
@@ -377,7 +380,7 @@ BGI_API void BGI_CALL wxbgi_world_rectangle(float x1, float y1, float z1,
 // wxbgi_world_polyline
 // =============================================================================
 
-BGI_API void BGI_CALL wxbgi_world_polyline(const float *xyzTriplets, int pointCount)
+BGI_API void BGI_CALL wxbgi_world_polyline(const float *xyzTriplets, int pointCount, int rb, const char *layerName)
 {
     if (xyzTriplets == nullptr || pointCount < 2)
         return;
@@ -395,7 +398,7 @@ BGI_API void BGI_CALL wxbgi_world_polyline(const float *xyzTriplets, int pointCo
         obj->pts.reserve(static_cast<std::size_t>(pointCount));
         for (int i = 0; i < pointCount; ++i)
             obj->pts.push_back({xyzTriplets[i * 3], xyzTriplets[i * 3 + 1], xyzTriplets[i * 3 + 2]});
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
 
     const int color = bgi::gState.currentColor;
@@ -428,7 +431,7 @@ BGI_API void BGI_CALL wxbgi_world_polyline(const float *xyzTriplets, int pointCo
 // wxbgi_world_fillpoly
 // =============================================================================
 
-BGI_API void BGI_CALL wxbgi_world_fillpoly(const float *xyzTriplets, int pointCount)
+BGI_API void BGI_CALL wxbgi_world_fillpoly(const float *xyzTriplets, int pointCount, int rb, const char *layerName)
 {
     if (xyzTriplets == nullptr || pointCount < 3)
         return;
@@ -446,7 +449,7 @@ BGI_API void BGI_CALL wxbgi_world_fillpoly(const float *xyzTriplets, int pointCo
         obj->pts.reserve(static_cast<std::size_t>(pointCount));
         for (int i = 0; i < pointCount; ++i)
             obj->pts.push_back({xyzTriplets[i * 3], xyzTriplets[i * 3 + 1], xyzTriplets[i * 3 + 2]});
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
 
     std::vector<std::pair<int, int>> pts;
@@ -476,7 +479,7 @@ BGI_API void BGI_CALL wxbgi_world_fillpoly(const float *xyzTriplets, int pointCo
 // wxbgi_world_outtextxy
 // =============================================================================
 
-BGI_API void BGI_CALL wxbgi_world_outtextxy(float x, float y, float z, const char *text)
+BGI_API void BGI_CALL wxbgi_world_outtextxy(float x, float y, float z, const char *text, int rb, const char *layerName)
 {
     if (text == nullptr)
         return;
@@ -497,7 +500,7 @@ BGI_API void BGI_CALL wxbgi_world_outtextxy(float x, float y, float z, const cha
         obj->coordSpace = bgi::CoordSpace::World3D;
         obj->pos        = {x, y, z};
         obj->text       = std::string(text);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
 
     // Apply text justification (mirrors drawTextAnchored in bgi_api.cpp)
@@ -566,7 +569,8 @@ namespace
 // =============================================================================
 
 BGI_API void BGI_CALL wxbgi_ucs_point(const char *ucsName,
-                                       float ux, float uy, float uz, int color)
+                                       float ux, float uy, float uz, int color,
+                                       int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
 
@@ -588,7 +592,7 @@ BGI_API void BGI_CALL wxbgi_ucs_point(const char *ucsName,
         obj->ucsName    = resolveUcsName(ucsName);
         obj->pos        = {ux, uy, uz};
         obj->color      = bgi::normalizeColor(color);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::setPixelWithMode(vpX, vpY, bgi::normalizeColor(color), bgi::gState.writeMode);
     bgi::flushToScreen();
@@ -600,7 +604,8 @@ BGI_API void BGI_CALL wxbgi_ucs_point(const char *ucsName,
 
 BGI_API void BGI_CALL wxbgi_ucs_line(const char *ucsName,
                                       float ux1, float uy1, float uz1,
-                                      float ux2, float uy2, float uz2)
+                                      float ux2, float uy2, float uz2,
+                                      int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
 
@@ -621,7 +626,7 @@ BGI_API void BGI_CALL wxbgi_ucs_line(const char *ucsName,
         obj->ucsName    = resolveUcsName(ucsName);
         obj->p1         = {ux1, uy1, uz1};
         obj->p2         = {ux2, uy2, uz2};
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     worldLineNoLock(*cam, wx1, wy1, wz1, wx2, wy2, wz2);
     bgi::flushToScreen();
@@ -632,7 +637,8 @@ BGI_API void BGI_CALL wxbgi_ucs_line(const char *ucsName,
 // =============================================================================
 
 BGI_API void BGI_CALL wxbgi_ucs_circle(const char *ucsName,
-                                        float cx, float cy, float cz, float radius)
+                                        float cx, float cy, float cz, float radius,
+                                        int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
 
@@ -659,7 +665,7 @@ BGI_API void BGI_CALL wxbgi_ucs_circle(const char *ucsName,
         obj->ucsName    = resolveUcsName(ucsName);
         obj->centre     = {cx, cy, cz};
         obj->radius     = radius;
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     worldCircleNoLock(*cam, wx, wy, wz, worldRadius);
     bgi::flushToScreen();
@@ -670,7 +676,8 @@ BGI_API void BGI_CALL wxbgi_ucs_circle(const char *ucsName,
 // =============================================================================
 
 BGI_API void BGI_CALL wxbgi_ucs_polyline(const char *ucsName,
-                                          const float *xyzTriplets, int pointCount)
+                                          const float *xyzTriplets, int pointCount,
+                                          int rb, const char *layerName)
 {
     if (xyzTriplets == nullptr || pointCount < 2)
         return;
@@ -690,7 +697,7 @@ BGI_API void BGI_CALL wxbgi_ucs_polyline(const char *ucsName,
         obj->pts.reserve(static_cast<std::size_t>(pointCount));
         for (int i = 0; i < pointCount; ++i)
             obj->pts.push_back({xyzTriplets[i * 3], xyzTriplets[i * 3 + 1], xyzTriplets[i * 3 + 2]});
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
 
     const int color = bgi::gState.currentColor;
@@ -728,7 +735,8 @@ BGI_API void BGI_CALL wxbgi_ucs_polyline(const char *ucsName,
 
 BGI_API void BGI_CALL wxbgi_ucs_outtextxy(const char *ucsName,
                                            float ux, float uy, float uz,
-                                           const char *text)
+                                           const char *text,
+                                           int rb, const char *layerName)
 {
     if (text == nullptr) return;
 
@@ -752,7 +760,7 @@ BGI_API void BGI_CALL wxbgi_ucs_outtextxy(const char *ucsName,
         obj->ucsName    = resolveUcsName(ucsName);
         obj->pos        = {ux, uy, uz};
         obj->text       = std::string(text);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
 
     const auto [tw, th] = bgi::measureText(std::string(text));

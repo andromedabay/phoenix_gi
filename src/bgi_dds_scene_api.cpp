@@ -53,6 +53,98 @@ static bgi::Camera3D *findCam(const std::string &name)
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
+// Layer management
+// ---------------------------------------------------------------------------
+
+BGI_API int BGI_CALL wxbgi_dds_layer_create(const char *name)
+{
+    if (name == nullptr || name[0] == '\0')
+        return 0;
+    std::lock_guard<std::mutex> lock(bgi::gMutex);
+    return bgi::gState.dds->createLayer(name) ? 1 : 0;
+}
+
+BGI_API int BGI_CALL wxbgi_dds_layer_delete(const char *name)
+{
+    if (name == nullptr || name[0] == '\0')
+        return 0;
+    std::lock_guard<std::mutex> lock(bgi::gMutex);
+    return bgi::gState.dds->deleteLayer(name) ? 1 : 0;
+}
+
+BGI_API int BGI_CALL wxbgi_dds_layer_clear(const char *name)
+{
+    if (name == nullptr || name[0] == '\0')
+        return 0;
+    std::lock_guard<std::mutex> lock(bgi::gMutex);
+    return bgi::gState.dds->clearLayer(name) ? 1 : 0;
+}
+
+BGI_API int BGI_CALL wxbgi_dds_layer_count(void)
+{
+    std::lock_guard<std::mutex> lock(bgi::gMutex);
+    return static_cast<int>(bgi::gState.dds->layers.size());
+}
+
+BGI_API const char *BGI_CALL wxbgi_dds_layer_get_name_at(int index)
+{
+    static thread_local std::string result;
+    result.clear();
+    if (index < 0)
+        return result.c_str();
+    std::lock_guard<std::mutex> lock(bgi::gMutex);
+    const auto names = bgi::gState.dds->layerNames();
+    if (index < static_cast<int>(names.size()))
+        result = names[static_cast<std::size_t>(index)];
+    return result.c_str();
+}
+
+BGI_API int BGI_CALL wxbgi_dds_layer_exists(const char *name)
+{
+    if (name == nullptr || name[0] == '\0')
+        return 0;
+    std::lock_guard<std::mutex> lock(bgi::gMutex);
+    return bgi::gState.dds->layerExists(name) ? 1 : 0;
+}
+
+BGI_API int BGI_CALL wxbgi_dds_layer_set_visible(const char *name, int visible)
+{
+    if (name == nullptr || name[0] == '\0')
+        return 0;
+    std::lock_guard<std::mutex> lock(bgi::gMutex);
+    return bgi::gState.dds->setLayerVisible(name, visible != 0) ? 1 : 0;
+}
+
+BGI_API int BGI_CALL wxbgi_dds_layer_get_visible(const char *name)
+{
+    if (name == nullptr || name[0] == '\0')
+        return 0;
+    std::lock_guard<std::mutex> lock(bgi::gMutex);
+    return bgi::gState.dds->layerVisible(name) ? 1 : 0;
+}
+
+BGI_API int BGI_CALL wxbgi_dds_set_layer(const char *id, const char *layerName)
+{
+    if (id == nullptr || id[0] == '\0' || layerName == nullptr || layerName[0] == '\0')
+        return 0;
+    std::lock_guard<std::mutex> lock(bgi::gMutex);
+    return bgi::gState.dds->setObjectLayer(id, layerName) ? 1 : 0;
+}
+
+BGI_API const char *BGI_CALL wxbgi_dds_get_layer(const char *id)
+{
+    static thread_local std::string result;
+    result.clear();
+    if (id == nullptr || id[0] == '\0')
+        return result.c_str();
+    std::lock_guard<std::mutex> lock(bgi::gMutex);
+    auto obj = bgi::gState.dds->findById(id);
+    if (obj)
+        result = obj->layerName;
+    return result.c_str();
+}
+
+// ---------------------------------------------------------------------------
 // Scene lifecycle
 // ---------------------------------------------------------------------------
 

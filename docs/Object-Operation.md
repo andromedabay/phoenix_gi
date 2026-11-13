@@ -25,7 +25,13 @@ The current retained object-operation API in `wx_bgi_dds.h` is:
 | `wxbgi_dds_get_child_count(id)` | Return the number of direct referenced child IDs |
 | `wxbgi_dds_get_child_at(id, index)` | Return one direct child ID from a retained operation node |
 
-All of these return or operate on normal DDS object IDs, so the results participate in:
+Retained calls accept trailing `rb` and `layerName` arguments. `rb == false`
+creates the operation node on the selected layer (`nullptr` selects
+`DefaultLayer`). With `rb == true`, transforms and set operations render a
+transient preview without creating a DDS node and return an empty ID. Both
+arguments have C++ defaults so older C++ call sites remain valid.
+
+All retained results use normal DDS object IDs, so they participate in:
 
 - `wxbgi_render_dds(...)`
 - `wxbgi_dds_to_json()` / `wxbgi_dds_to_yaml()`

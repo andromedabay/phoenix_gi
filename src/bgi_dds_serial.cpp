@@ -249,6 +249,7 @@ void baseObjToJ(json &j, const bgi::DdsObject &o)
     j["label"]   = o.label;
     j["type"]    = typeStr(o.type);
     j["visible"] = o.visible;
+    j["layer"]   = o.layerName;
     if (!o.externalAttributes.values.empty())
         j["externalAttributes"] = externalAttrsToJ(o.externalAttributes);
 }
@@ -1014,6 +1015,17 @@ json sceneToJson()
     });
     root["objects"] = objs;
 
+    auto layersToJ = [](const bgi::DdsScene &scene) {
+        auto out = json::array();
+        for (const auto &name : scene.layerNames())
+            out.push_back({{"name", name}, {"visible", scene.layerVisible(name)}});
+        return out;
+    };
+    auto layers = json::object();
+    for (const auto &[sname, scene] : bgi::gState.ddsRegistry)
+        layers[sname] = layersToJ(*scene);
+    root["layers"] = std::move(layers);
+
     // Multi-scene: serialize all non-default scenes under "scenes".
     auto scenes = json::object();
     for (const auto &[sname, scene] : bgi::gState.ddsRegistry)
@@ -1049,12 +1061,37 @@ void sceneFromJson(const json &root)
     if (!bgi::gState.ddsRegistry.count("default"))
         bgi::gState.ddsRegistry["default"] = std::make_unique<bgi::DdsScene>();
     else
+    {
         bgi::gState.ddsRegistry["default"]->clearAll();
+        bgi::gState.ddsRegistry["default"]->resetLayers();
+    }
     bgi::gState.activeDdsName = "default";
     bgi::gState.dds = bgi::gState.ddsRegistry["default"].get();
     bgi::gState.cameras.clear();
     bgi::gState.ucsSystems.clear();
     bgi::gState.worldExtents = bgi::WorldExtents{};
+
+    auto loadLayersIntoScene = [&](const json &layerArray, const std::string &sname)
+    {
+        auto &scene = bgi::gState.ddsRegistry.at(sname);
+        scene->resetLayers();
+        if (!layerArray.is_array())
+            return;
+        for (const auto &entry : layerArray)
+        {
+            if (!entry.is_object())
+                continue;
+            const std::string name = entry.value("name", "");
+            if (name.empty())
+                continue;
+            if (name != "DefaultLayer" && !scene->createLayer(name))
+                continue;
+            scene->setLayerVisible(name, entry.value("visible", true));
+        }
+    };
+    if (root.contains("layers") && root["layers"].is_object() &&
+        root["layers"].contains("default"))
+        loadLayersIntoScene(root["layers"]["default"], "default");
 
     // World extents
     if (root.contains("worldExtents")) {
@@ -1086,6 +1123,7 @@ void sceneFromJson(const json &root)
             obj->id      = jo.value("id",      "");
             obj->label   = jo.value("label",   "");
             obj->visible = jo.value("visible", true);
+            obj->layerName = jo.value("layer", std::string("DefaultLayer"));
             if (jo.contains("externalAttributes"))
                 obj->externalAttributes = externalAttrsFromJ(jo["externalAttributes"]);
 
@@ -1118,6 +1156,9 @@ void sceneFromJson(const json &root)
                 continue; // already loaded above
             if (!bgi::gState.ddsRegistry.count(sname))
                 bgi::gState.ddsRegistry[sname] = std::make_unique<bgi::DdsScene>();
+            if (root.contains("layers") && root["layers"].is_object() &&
+                root["layers"].contains(sname))
+                loadLayersIntoScene(root["layers"][sname], sname);
             loadObjectsIntoScene(sarr, sname);
         }
     }
@@ -1295,6 +1336,7 @@ void baseObjToY(YAML::Node &n, const bgi::DdsObject &o)
     n["label"]   = o.label;
     n["type"]    = typeStr(o.type);
     n["visible"] = o.visible;
+    n["layer"]   = o.layerName;
     if (!o.externalAttributes.values.empty())
         n["externalAttributes"] = externalAttrsToY(o.externalAttributes);
 }
@@ -1695,6 +1737,7 @@ std::shared_ptr<bgi::DdsObject> objectFromY(const YAML::Node &n)
         o.id      = id;
         o.label   = n["label"]   ? n["label"].as<std::string>()   : "";
         o.visible = n["visible"] ? n["visible"].as<bool>(true)     : true;
+        o.layerName = n["layer"] ? n["layer"].as<std::string>("DefaultLayer") : "DefaultLayer";
         if (n["externalAttributes"])
             o.externalAttributes = externalAttrsFromY(n["externalAttributes"]);
     };
@@ -2038,12 +2081,37 @@ void sceneFromYaml(const YAML::Node &root)
     if (!bgi::gState.ddsRegistry.count("default"))
         bgi::gState.ddsRegistry["default"] = std::make_unique<bgi::DdsScene>();
     else
+    {
         bgi::gState.ddsRegistry["default"]->clearAll();
+        bgi::gState.ddsRegistry["default"]->resetLayers();
+    }
     bgi::gState.activeDdsName = "default";
     bgi::gState.dds = bgi::gState.ddsRegistry["default"].get();
     bgi::gState.cameras.clear();
     bgi::gState.ucsSystems.clear();
     bgi::gState.worldExtents = bgi::WorldExtents{};
+
+    auto loadYamlLayersIntoScene = [&](const YAML::Node &layerArray, const std::string &sname)
+    {
+        auto &scene = bgi::gState.ddsRegistry.at(sname);
+        scene->resetLayers();
+        if (!layerArray || !layerArray.IsSequence())
+            return;
+        for (const auto &entry : layerArray)
+        {
+            if (!entry.IsMap() || !entry["name"])
+                continue;
+            const std::string name = entry["name"].as<std::string>("");
+            if (name.empty())
+                continue;
+            if (name != "DefaultLayer" && !scene->createLayer(name))
+                continue;
+            const bool visible = entry["visible"] ? entry["visible"].as<bool>(true) : true;
+            scene->setLayerVisible(name, visible);
+        }
+    };
+    if (root["layers"] && root["layers"].IsMap() && root["layers"]["default"])
+        loadYamlLayersIntoScene(root["layers"]["default"], "default");
 
     if (root["worldExtents"]) {
         const auto &we = root["worldExtents"];
@@ -2089,6 +2157,8 @@ void sceneFromYaml(const YAML::Node &root)
                 continue;
             if (!bgi::gState.ddsRegistry.count(sname))
                 bgi::gState.ddsRegistry[sname] = std::make_unique<bgi::DdsScene>();
+            if (root["layers"] && root["layers"].IsMap() && root["layers"][sname])
+                loadYamlLayersIntoScene(root["layers"][sname], sname);
             loadYamlIntoScene(kv.second, sname);
         }
     }
@@ -2174,6 +2244,21 @@ BGI_API const char *BGI_CALL wxbgi_dds_to_yaml(void)
             objs.push_back(objectToY(obj));
         });
         root["objects"] = objs;
+
+        YAML::Node layerScenes(YAML::NodeType::Map);
+        for (const auto &[sname, scene] : bgi::gState.ddsRegistry)
+        {
+            YAML::Node entries(YAML::NodeType::Sequence);
+            for (const auto &name : scene->layerNames())
+            {
+                YAML::Node entry;
+                entry["name"] = name;
+                entry["visible"] = scene->layerVisible(name);
+                entries.push_back(entry);
+            }
+            layerScenes[sname] = entries;
+        }
+        root["layers"] = layerScenes;
 
         // Multi-scene: serialize non-default scenes under "scenes".
         YAML::Node scenes(YAML::NodeType::Map);
@@ -2287,6 +2372,20 @@ BGI_API int BGI_CALL wxbgi_dds_save_yaml(const char *filePath)
                 objs.push_back(objectToY(obj));
             });
             root["objects"] = objs;
+            YAML::Node layerScenes(YAML::NodeType::Map);
+            for (const auto &[sname, scene] : bgi::gState.ddsRegistry)
+            {
+                YAML::Node entries(YAML::NodeType::Sequence);
+                for (const auto &name : scene->layerNames())
+                {
+                    YAML::Node entry;
+                    entry["name"] = name;
+                    entry["visible"] = scene->layerVisible(name);
+                    entries.push_back(entry);
+                }
+                layerScenes[sname] = entries;
+            }
+            root["layers"] = layerScenes;
             std::ostringstream oss;
             oss << root;
             s = oss.str();

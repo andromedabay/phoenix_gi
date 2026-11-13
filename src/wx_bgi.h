@@ -13,13 +13,13 @@
  */
 
 /** @brief Draws a circular arc. */
-BGI_API void BGI_CALL arc(int x, int y, int stangle, int endangle, int radius);
+BGI_API void BGI_CALL arc(int x, int y, int stangle, int endangle, int radius, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Draws a filled rectangle using the active fill style/color. */
-BGI_API void BGI_CALL bar(int left, int top, int right, int bottom);
+BGI_API void BGI_CALL bar(int left, int top, int right, int bottom, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Draws a pseudo-3D filled rectangle. */
-BGI_API void BGI_CALL bar3d(int left, int top, int right, int bottom, int depth, int topflag);
+BGI_API void BGI_CALL bar3d(int left, int top, int right, int bottom, int depth, int topflag, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Draws a circle outline. */
-BGI_API void BGI_CALL circle(int x, int y, int radius);
+BGI_API void BGI_CALL circle(int x, int y, int radius, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Clears the full active drawing page to background color. */
 BGI_API void BGI_CALL cleardevice(void);
 /** @brief Clears only the active viewport region to background color. */
@@ -31,13 +31,13 @@ BGI_API void BGI_CALL delay(int millisec);
 /** @brief Detects/initializes default graph driver and mode values. */
 BGI_API void BGI_CALL detectgraph(int *graphdriver, int *graphmode);
 /** @brief Draws a polygon outline from an array of x/y point pairs. */
-BGI_API void BGI_CALL drawpoly(int numpoints, const int *polypoints);
+BGI_API void BGI_CALL drawpoly(int numpoints, const int *polypoints, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Draws an elliptical arc between start and end angles. */
-BGI_API void BGI_CALL ellipse(int x, int y, int stangle, int endangle, int xradius, int yradius);
+BGI_API void BGI_CALL ellipse(int x, int y, int stangle, int endangle, int xradius, int yradius, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Draws and fills an ellipse using current fill settings. */
-BGI_API void BGI_CALL fillellipse(int x, int y, int xradius, int yradius);
+BGI_API void BGI_CALL fillellipse(int x, int y, int xradius, int yradius, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Fills a polygon interior from an array of x/y point pairs. */
-BGI_API void BGI_CALL fillpoly(int numpoints, const int *polypoints);
+BGI_API void BGI_CALL fillpoly(int numpoints, const int *polypoints, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Flood-fills a region until the border color is reached. */
 BGI_API void BGI_CALL floodfill(int x, int y, int border);
 /** @brief Returns the currently selected active page index. */
@@ -117,27 +117,27 @@ BGI_API int BGI_CALL installuserdriver(char *name, void *detect);
 /** @brief Compatibility hook for installing a user font. */
 BGI_API int BGI_CALL installuserfont(char *name);
 /** @brief Draws a line between two points. */
-BGI_API void BGI_CALL line(int x1, int y1, int x2, int y2);
+BGI_API void BGI_CALL line(int x1, int y1, int x2, int y2, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Draws a line relative to current pen position and updates pen. */
-BGI_API void BGI_CALL linerel(int dx, int dy);
+BGI_API void BGI_CALL linerel(int dx, int dy, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Draws a line to absolute coordinates from current pen position. */
-BGI_API void BGI_CALL lineto(int x, int y);
+BGI_API void BGI_CALL lineto(int x, int y, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Moves pen position by relative delta without drawing. */
 BGI_API void BGI_CALL moverel(int dx, int dy);
 /** @brief Moves pen position to absolute coordinates without drawing. */
 BGI_API void BGI_CALL moveto(int x, int y);
 /** @brief Renders text at current pen position and advances the pen. */
-BGI_API void BGI_CALL outtext(char *textstring);
+BGI_API void BGI_CALL outtext(char *textstring, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Renders text at explicit x/y coordinates. */
-BGI_API void BGI_CALL outtextxy(int x, int y, char *textstring);
+BGI_API void BGI_CALL outtextxy(int x, int y, char *textstring, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Draws and fills a pie-slice sector. */
-BGI_API void BGI_CALL pieslice(int x, int y, int stangle, int endangle, int radius);
+BGI_API void BGI_CALL pieslice(int x, int y, int stangle, int endangle, int radius, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Draws an encoded BGI image buffer onto the active page. */
-BGI_API void BGI_CALL putimage(int left, int top, void *bitmap, int op);
+BGI_API void BGI_CALL putimage(int left, int top, void *bitmap, int op, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Writes one pixel using current write mode semantics. */
-BGI_API void BGI_CALL putpixel(int x, int y, int color);
+BGI_API void BGI_CALL putpixel(int x, int y, int color, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Draws a rectangle outline. */
-BGI_API void BGI_CALL rectangle(int left, int top, int right, int bottom);
+BGI_API void BGI_CALL rectangle(int left, int top, int right, int bottom, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Compatibility registration for a BGI driver callback. */
 BGI_API int BGI_CALL registerbgidriver(void (*driver)(void));
 /** @brief Compatibility registration for a BGI font callback. */
@@ -145,7 +145,7 @@ BGI_API int BGI_CALL registerbgifont(void (*font)(void));
 /** @brief Restores text/console mode by closing graphics resources. */
 BGI_API void BGI_CALL restorecrtmode(void);
 /** @brief Draws and fills an elliptical sector. */
-BGI_API void BGI_CALL sector(int x, int y, int stangle, int endangle, int xradius, int yradius);
+BGI_API void BGI_CALL sector(int x, int y, int stangle, int endangle, int xradius, int yradius, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 /** @brief Selects which page receives drawing commands. */
 BGI_API void BGI_CALL setactivepage(int page);
 /** @brief Replaces entire palette mapping from a supplied palette structure. */

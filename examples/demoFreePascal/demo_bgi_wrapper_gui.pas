@@ -26,11 +26,11 @@ const
 {$ENDIF}
 
 procedure initgraph(graphdriver, graphmode: PLongInt; pathtodriver: PChar); cdecl; external BgiLib;
-procedure line(x1, y1, x2, y2: LongInt); cdecl; external BgiLib;
-procedure circle(x, y, radius: LongInt); cdecl; external BgiLib;
-procedure rectangle(left, top, right, bottom: LongInt); cdecl; external BgiLib;
+procedure line(x1, y1, x2, y2: LongInt; rb: LongInt = 0; layerName: PChar = nil); cdecl; external BgiLib;
+procedure circle(x, y, radius: LongInt; rb: LongInt = 0; layerName: PChar = nil); cdecl; external BgiLib;
+procedure rectangle(left, top, right, bottom: LongInt; rb: LongInt = 0; layerName: PChar = nil); cdecl; external BgiLib;
 procedure setcolor(color: LongInt); cdecl; external BgiLib;
-procedure outtextxy(x, y: LongInt; textstring: PChar); cdecl; external BgiLib;
+procedure outtextxy(x, y: LongInt; textstring: PChar; rb: LongInt = 0; layerName: PChar = nil); cdecl; external BgiLib;
 procedure floodfill(x, y, border: LongInt); cdecl; external BgiLib;
 procedure setfillstyle(pattern, color: LongInt); cdecl; external BgiLib;
 function graphresult: LongInt; cdecl; external BgiLib;

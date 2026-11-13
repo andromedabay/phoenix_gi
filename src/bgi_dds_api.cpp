@@ -174,7 +174,7 @@ bool setFaceColor(bgi::DdsObject &obj, int color)
 }
 
 template <typename TSetOp>
-const char *createSetOp(int count, const char *const *ids)
+const char *createSetOp(int count, const char *const *ids, int rb, const char *layerName)
 {
     static thread_local std::string result;
     result.clear();
@@ -203,11 +203,19 @@ const char *createSetOp(int count, const char *const *ids)
     obj->drawMode = bgi::gState.solidDrawMode;
     obj->edgeColor = bgi::gState.solidEdgeColor;
     obj->faceColor = bgi::gState.solidFaceColor;
-    result = bgi::gState.dds->append(obj)->id;
+    if (rb != 0)
+    {
+        bgi::renderDdsPreview(*obj, glm::mat4(1.f));
+        return result.c_str();
+    }
+    if (!bgi::appendDdsObject(obj, rb, layerName))
+        return result.c_str();
+    result = obj->id;
     return result.c_str();
 }
 
-static const char *createTransformNode(const char *id, const glm::mat4 &matrix)
+static const char *createTransformNode(const char *id, const glm::mat4 &matrix,
+                                       int rb, const char *layerName)
 {
     static thread_local std::string result;
     result.clear();
@@ -228,7 +236,14 @@ static const char *createTransformNode(const char *id, const glm::mat4 &matrix)
     obj->style.lineStyle = bgi::gState.lineSettings;
     obj->style.textStyle = bgi::gState.textSettings;
     obj->style.writeMode = bgi::gState.writeMode;
-    result = bgi::gState.dds->append(obj)->id;
+    if (rb != 0)
+    {
+        bgi::renderDdsPreview(*obj, glm::mat4(1.f));
+        return result.c_str();
+    }
+    if (!bgi::appendDdsObject(obj, rb, layerName))
+        return result.c_str();
+    result = obj->id;
     return result.c_str();
 }
 
@@ -600,100 +615,101 @@ BGI_API void BGI_CALL wxbgi_dds_clear_all(void)
 // Retained composition helpers
 // =============================================================================
 
-BGI_API const char *BGI_CALL wxbgi_dds_translate(const char *id, float dx, float dy, float dz)
+BGI_API const char *BGI_CALL wxbgi_dds_translate(const char *id, float dx, float dy, float dz, int rb, const char *layerName)
 {
-    return createTransformNode(id, glm::translate(glm::mat4(1.f), glm::vec3(dx, dy, dz)));
+    return createTransformNode(id, glm::translate(glm::mat4(1.f), glm::vec3(dx, dy, dz)), rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_x_deg(const char *id, float angleDeg)
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_x_deg(const char *id, float angleDeg, int rb, const char *layerName)
 {
     return createTransformNode(id,
-        glm::rotate(glm::mat4(1.f), glm::radians(angleDeg), glm::vec3(1.f, 0.f, 0.f)));
+        glm::rotate(glm::mat4(1.f), glm::radians(angleDeg), glm::vec3(1.f, 0.f, 0.f)), rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_y_deg(const char *id, float angleDeg)
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_y_deg(const char *id, float angleDeg, int rb, const char *layerName)
 {
     return createTransformNode(id,
-        glm::rotate(glm::mat4(1.f), glm::radians(angleDeg), glm::vec3(0.f, 1.f, 0.f)));
+        glm::rotate(glm::mat4(1.f), glm::radians(angleDeg), glm::vec3(0.f, 1.f, 0.f)), rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_z_deg(const char *id, float angleDeg)
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_z_deg(const char *id, float angleDeg, int rb, const char *layerName)
 {
     return createTransformNode(id,
-        glm::rotate(glm::mat4(1.f), glm::radians(angleDeg), glm::vec3(0.f, 0.f, 1.f)));
+        glm::rotate(glm::mat4(1.f), glm::radians(angleDeg), glm::vec3(0.f, 0.f, 1.f)), rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_x_rad(const char *id, float angleRad)
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_x_rad(const char *id, float angleRad, int rb, const char *layerName)
 {
     return createTransformNode(id,
-        glm::rotate(glm::mat4(1.f), angleRad, glm::vec3(1.f, 0.f, 0.f)));
+        glm::rotate(glm::mat4(1.f), angleRad, glm::vec3(1.f, 0.f, 0.f)), rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_y_rad(const char *id, float angleRad)
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_y_rad(const char *id, float angleRad, int rb, const char *layerName)
 {
     return createTransformNode(id,
-        glm::rotate(glm::mat4(1.f), angleRad, glm::vec3(0.f, 1.f, 0.f)));
+        glm::rotate(glm::mat4(1.f), angleRad, glm::vec3(0.f, 1.f, 0.f)), rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_z_rad(const char *id, float angleRad)
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_z_rad(const char *id, float angleRad, int rb, const char *layerName)
 {
     return createTransformNode(id,
-        glm::rotate(glm::mat4(1.f), angleRad, glm::vec3(0.f, 0.f, 1.f)));
+        glm::rotate(glm::mat4(1.f), angleRad, glm::vec3(0.f, 0.f, 1.f)), rb, layerName);
 }
 
 BGI_API const char *BGI_CALL wxbgi_dds_rotate_axis_deg(const char *id,
                                                         float axisX, float axisY, float axisZ,
-                                                        float angleDeg)
+                                                        float angleDeg, int rb, const char *layerName)
 {
     const glm::vec3 axis(axisX, axisY, axisZ);
     if (glm::length(axis) <= 1e-6f)
         return "";
     return createTransformNode(id,
-        glm::rotate(glm::mat4(1.f), glm::radians(angleDeg), glm::normalize(axis)));
+        glm::rotate(glm::mat4(1.f), glm::radians(angleDeg), glm::normalize(axis)), rb, layerName);
 }
 
 BGI_API const char *BGI_CALL wxbgi_dds_rotate_axis_rad(const char *id,
                                                         float axisX, float axisY, float axisZ,
-                                                        float angleRad)
+                                                        float angleRad, int rb, const char *layerName)
 {
     const glm::vec3 axis(axisX, axisY, axisZ);
     if (glm::length(axis) <= 1e-6f)
         return "";
     return createTransformNode(id,
-        glm::rotate(glm::mat4(1.f), angleRad, glm::normalize(axis)));
+        glm::rotate(glm::mat4(1.f), angleRad, glm::normalize(axis)), rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_scale_uniform(const char *id, float factor)
+BGI_API const char *BGI_CALL wxbgi_dds_scale_uniform(const char *id, float factor, int rb, const char *layerName)
 {
-    return createTransformNode(id, glm::scale(glm::mat4(1.f), glm::vec3(factor, factor, factor)));
+    return createTransformNode(id, glm::scale(glm::mat4(1.f), glm::vec3(factor, factor, factor)), rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_scale_xyz(const char *id, float sx, float sy, float sz)
+BGI_API const char *BGI_CALL wxbgi_dds_scale_xyz(const char *id, float sx, float sy, float sz, int rb, const char *layerName)
 {
-    return createTransformNode(id, glm::scale(glm::mat4(1.f), glm::vec3(sx, sy, sz)));
+    return createTransformNode(id, glm::scale(glm::mat4(1.f), glm::vec3(sx, sy, sz)), rb, layerName);
 }
 
 BGI_API const char *BGI_CALL wxbgi_dds_skew(const char *id,
                                              float xy, float xz,
                                              float yx, float yz,
-                                             float zx, float zy)
+                                             float zx, float zy,
+                                             int rb, const char *layerName)
 {
-    return createTransformNode(id, skewMatrix(xy, xz, yx, yz, zx, zy));
+    return createTransformNode(id, skewMatrix(xy, xz, yx, yz, zx, zy), rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_union(int count, const char *const *ids)
+BGI_API const char *BGI_CALL wxbgi_dds_union(int count, const char *const *ids, int rb, const char *layerName)
 {
-    return createSetOp<bgi::DdsSetUnion>(count, ids);
+    return createSetOp<bgi::DdsSetUnion>(count, ids, rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_intersection(int count, const char *const *ids)
+BGI_API const char *BGI_CALL wxbgi_dds_intersection(int count, const char *const *ids, int rb, const char *layerName)
 {
-    return createSetOp<bgi::DdsSetIntersection>(count, ids);
+    return createSetOp<bgi::DdsSetIntersection>(count, ids, rb, layerName);
 }
 
-BGI_API const char *BGI_CALL wxbgi_dds_difference(int count, const char *const *ids)
+BGI_API const char *BGI_CALL wxbgi_dds_difference(int count, const char *const *ids, int rb, const char *layerName)
 {
-    return createSetOp<bgi::DdsSetDifference>(count, ids);
+    return createSetOp<bgi::DdsSetDifference>(count, ids, rb, layerName);
 }
 
 BGI_API int BGI_CALL wxbgi_dds_get_child_count(const char *id)

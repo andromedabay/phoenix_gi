@@ -258,7 +258,7 @@ BGI_API void BGI_CALL wxbgi_dds_clear_all(void);
  *
  * Returns a pointer to an internal thread-local buffer. Returns "" on error.
  */
-BGI_API const char *BGI_CALL wxbgi_dds_translate(const char *id, float dx, float dy, float dz);
+BGI_API const char *BGI_CALL wxbgi_dds_translate(const char *id, float dx, float dy, float dz, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * @brief Creates a retained transform node that rotates @p id about the world X axis.
@@ -266,12 +266,12 @@ BGI_API const char *BGI_CALL wxbgi_dds_translate(const char *id, float dx, float
  * The rotation is applied about the world origin. Compose with translate nodes
  * to rotate about another pivot.
  */
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_x_deg(const char *id, float angleDeg);
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_y_deg(const char *id, float angleDeg);
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_z_deg(const char *id, float angleDeg);
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_x_rad(const char *id, float angleRad);
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_y_rad(const char *id, float angleRad);
-BGI_API const char *BGI_CALL wxbgi_dds_rotate_z_rad(const char *id, float angleRad);
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_x_deg(const char *id, float angleDeg, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_y_deg(const char *id, float angleDeg, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_z_deg(const char *id, float angleDeg, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_x_rad(const char *id, float angleRad, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_y_rad(const char *id, float angleRad, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
+BGI_API const char *BGI_CALL wxbgi_dds_rotate_z_rad(const char *id, float angleRad, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * @brief Creates a retained transform node that rotates @p id around an arbitrary axis.
@@ -281,10 +281,12 @@ BGI_API const char *BGI_CALL wxbgi_dds_rotate_z_rad(const char *id, float angleR
  */
 BGI_API const char *BGI_CALL wxbgi_dds_rotate_axis_deg(const char *id,
                                                         float axisX, float axisY, float axisZ,
-                                                        float angleDeg);
+                                                        float angleDeg,
+                                                        int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 BGI_API const char *BGI_CALL wxbgi_dds_rotate_axis_rad(const char *id,
                                                         float axisX, float axisY, float axisZ,
-                                                        float angleRad);
+                                                        float angleRad,
+                                                        int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * @brief Creates a retained transform node that scales @p id by the given factor(s).
@@ -292,8 +294,8 @@ BGI_API const char *BGI_CALL wxbgi_dds_rotate_axis_rad(const char *id,
  * Scaling is applied about the world origin. Use translate/scale/translate to
  * scale about another pivot.
  */
-BGI_API const char *BGI_CALL wxbgi_dds_scale_uniform(const char *id, float factor);
-BGI_API const char *BGI_CALL wxbgi_dds_scale_xyz(const char *id, float sx, float sy, float sz);
+BGI_API const char *BGI_CALL wxbgi_dds_scale_uniform(const char *id, float factor, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
+BGI_API const char *BGI_CALL wxbgi_dds_scale_xyz(const char *id, float sx, float sy, float sz, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * @brief Creates a retained transform node with a 3D shear/skew matrix.
@@ -306,7 +308,8 @@ BGI_API const char *BGI_CALL wxbgi_dds_scale_xyz(const char *id, float sx, float
 BGI_API const char *BGI_CALL wxbgi_dds_skew(const char *id,
                                              float xy, float xz,
                                              float yx, float yz,
-                                             float zx, float zy);
+                                             float zx, float zy,
+                                             int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * @brief Creates a retained SetUnion node over @p count operand IDs.
@@ -314,7 +317,7 @@ BGI_API const char *BGI_CALL wxbgi_dds_skew(const char *id,
  * Operands are referenced by ID; they are not copied. Returns the new DDS ID,
  * or "" on error.
  */
-BGI_API const char *BGI_CALL wxbgi_dds_union(int count, const char *const *ids);
+BGI_API const char *BGI_CALL wxbgi_dds_union(int count, const char *const *ids, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * @brief Creates a retained SetIntersection node over @p count operand IDs.
@@ -322,7 +325,7 @@ BGI_API const char *BGI_CALL wxbgi_dds_union(int count, const char *const *ids);
  * Operands are referenced by ID; they are not copied. Returns the new DDS ID,
  * or "" on error.
  */
-BGI_API const char *BGI_CALL wxbgi_dds_intersection(int count, const char *const *ids);
+BGI_API const char *BGI_CALL wxbgi_dds_intersection(int count, const char *const *ids, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * @brief Creates a retained SetDifference node over @p count operand IDs.
@@ -331,7 +334,7 @@ BGI_API const char *BGI_CALL wxbgi_dds_intersection(int count, const char *const
  * remaining operand is subtracted from it in sequence. Operands are referenced
  * by ID; they are not copied. Returns the new DDS ID, or "" on error.
  */
-BGI_API const char *BGI_CALL wxbgi_dds_difference(int count, const char *const *ids);
+BGI_API const char *BGI_CALL wxbgi_dds_difference(int count, const char *const *ids, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * @brief Returns the number of direct child IDs referenced by a retained
@@ -499,6 +502,40 @@ BGI_API void BGI_CALL wxbgi_solid_set_specular(float s, float shininess);
 //   wxbgi_cam_set_scene("cam_side", "secondary");// cam_side renders "secondary"
 //   wxbgi_render_dds("cam_main");               // renders "default" scene
 //   wxbgi_render_dds("cam_side");               // renders "secondary" scene
+
+/**
+ * @brief Creates a layer in the active DDS scene.
+ * @return 1 on success, 0 for an empty or duplicate name.
+ */
+BGI_API int BGI_CALL wxbgi_dds_layer_create(const char *name);
+
+/** @brief Deletes a layer and all drawing objects assigned to it.
+ *  The required DefaultLayer cannot be deleted. Returns 1 on success. */
+BGI_API int BGI_CALL wxbgi_dds_layer_delete(const char *name);
+
+/** @brief Removes drawing objects assigned to the named layer; keeps the layer. */
+BGI_API int BGI_CALL wxbgi_dds_layer_clear(const char *name);
+
+/** @brief Returns the number of layers in the active scene. */
+BGI_API int BGI_CALL wxbgi_dds_layer_count(void);
+
+/** @brief Returns a layer name by sorted index, or "" when out of range. */
+BGI_API const char *BGI_CALL wxbgi_dds_layer_get_name_at(int index);
+
+/** @brief Returns 1 if the named layer exists in the active scene. */
+BGI_API int BGI_CALL wxbgi_dds_layer_exists(const char *name);
+
+/** @brief Sets layer visibility; hidden layers are omitted from DDS rendering. */
+BGI_API int BGI_CALL wxbgi_dds_layer_set_visible(const char *name, int visible);
+
+/** @brief Returns 1 when the layer exists and is visible, otherwise 0. */
+BGI_API int BGI_CALL wxbgi_dds_layer_get_visible(const char *name);
+
+/** @brief Assigns a drawing object to an existing layer. */
+BGI_API int BGI_CALL wxbgi_dds_set_layer(const char *id, const char *layerName);
+
+/** @brief Returns the assigned layer name, or "" if the object is missing. */
+BGI_API const char *BGI_CALL wxbgi_dds_get_layer(const char *id);
 
 /**
  * @brief Creates a new named DDS scene graph.

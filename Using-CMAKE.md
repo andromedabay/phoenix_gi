@@ -112,7 +112,7 @@ cmake -S . -B build-test -DWXBGI_ENABLE_TEST_SEAMS=ON
 Notes:
 
 - `WXBGI_ENABLE_TEST_SEAMS=ON` is required for seam-dependent tests such as `test_input_hooks` and `test_input_bypass`.
-- Tests that are demos/interactive apps are intentionally not registered in CTest.
+- Interactive demos are generally not registered in CTest. `wxbgi_rubberband_demo` is a bounded smoke run and is registered alongside the automated `test_dds_layers` coverage.
 
 ### 2) Build test executables
 
@@ -180,6 +180,12 @@ Run one test by exact name:
 
 ```bash
 ctest --test-dir build-test -R "^test_dds_csg$" --output-on-failure
+```
+
+Run the DDS layer and rubber-band coverage:
+
+```bash
+ctest --test-dir build-test -R "^(test_dds_layers|wxbgi_rubberband_demo)$" --output-on-failure
 ```
 
 Exclude known long or optional groups:

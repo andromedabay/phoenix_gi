@@ -19,6 +19,14 @@ if(WXBGI_ENABLE_WX)
     target_link_libraries(test_dds_clear PRIVATE phoenix_gi)
     wxbgi_copy_runtime(test_dds_clear)
 
+    add_executable(test_dds_layers examples/cpp/test_dds_layers.cpp)
+    target_link_libraries(test_dds_layers PRIVATE phoenix_gi)
+    wxbgi_copy_runtime(test_dds_layers)
+
+    add_executable(wxbgi_rubberband_demo examples/cpp/wxbgi_rubberband_demo.cpp)
+    target_link_libraries(wxbgi_rubberband_demo PRIVATE phoenix_gi)
+    wxbgi_copy_runtime(wxbgi_rubberband_demo)
+
     add_executable(wxbgi_multi_scene_demo examples/cpp/wxbgi_multi_scene_demo.cpp)
     target_link_libraries(wxbgi_multi_scene_demo PRIVATE phoenix_gi)
     wxbgi_copy_runtime(wxbgi_multi_scene_demo)

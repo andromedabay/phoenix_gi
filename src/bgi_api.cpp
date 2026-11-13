@@ -426,7 +426,7 @@ namespace
     }
 } // namespace
 
-BGI_API void BGI_CALL arc(int x, int y, int stangle, int endangle, int radius)
+BGI_API void BGI_CALL arc(int x, int y, int stangle, int endangle, int radius, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady() || radius < 0)
@@ -444,13 +444,13 @@ BGI_API void BGI_CALL arc(int x, int y, int stangle, int endangle, int radius)
         obj->radius     = float(radius);
         obj->startAngle = float(stangle);
         obj->endAngle   = float(endangle);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawEllipseInternal(x, y, stangle, endangle, radius, radius, bgi::gState.currentColor);
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL bar(int left, int top, int right, int bottom)
+BGI_API void BGI_CALL bar(int left, int top, int right, int bottom, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady())
@@ -462,13 +462,13 @@ BGI_API void BGI_CALL bar(int left, int top, int right, int bottom)
         obj->style = captureStyle();
         obj->p1    = {float(left), float(top), 0.f};
         obj->p2    = {float(right), float(bottom), 0.f};
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::fillRectInternal(left, top, right, bottom, bgi::gState.fillColor);
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL bar3d(int left, int top, int right, int bottom, int depth, int topflag)
+BGI_API void BGI_CALL bar3d(int left, int top, int right, int bottom, int depth, int topflag, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady())
@@ -482,7 +482,7 @@ BGI_API void BGI_CALL bar3d(int left, int top, int right, int bottom, int depth,
         obj->p2      = {float(right), float(bottom), 0.f};
         obj->depth   = float(depth);
         obj->topFlag = (topflag != 0);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::fillRectInternal(left, top, right, bottom, bgi::gState.fillColor);
     bgi::drawLineInternal(left, top, right, top, bgi::gState.currentColor);
@@ -500,7 +500,7 @@ BGI_API void BGI_CALL bar3d(int left, int top, int right, int bottom, int depth,
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL circle(int x, int y, int radius)
+BGI_API void BGI_CALL circle(int x, int y, int radius, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady() || radius < 0)
@@ -514,7 +514,7 @@ BGI_API void BGI_CALL circle(int x, int y, int radius)
         obj->style  = captureStyle();
         obj->centre = {float(x), float(y), 0.f};
         obj->radius = float(radius);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawCircleInternal(x, y, radius, bgi::gState.currentColor);
     flushIfVisible();
@@ -589,7 +589,7 @@ BGI_API void BGI_CALL detectgraph(int *graphdriver, int *graphmode)
     bgi::gState.lastResult = bgi::grOk;
 }
 
-BGI_API void BGI_CALL drawpoly(int numpoints, const int *polypoints)
+BGI_API void BGI_CALL drawpoly(int numpoints, const int *polypoints, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady())
@@ -607,13 +607,13 @@ BGI_API void BGI_CALL drawpoly(int numpoints, const int *polypoints)
         auto obj      = std::make_shared<bgi::DdsPolygon>();
         obj->style    = captureStyle();
         obj->pts      = pairsToVec3(points);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawPolygonInternal(points, bgi::gState.currentColor);
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL ellipse(int x, int y, int stangle, int endangle, int xradius, int yradius)
+BGI_API void BGI_CALL ellipse(int x, int y, int stangle, int endangle, int xradius, int yradius, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady() || xradius < 0 || yradius < 0)
@@ -632,13 +632,13 @@ BGI_API void BGI_CALL ellipse(int x, int y, int stangle, int endangle, int xradi
         obj->ry         = float(yradius);
         obj->startAngle = float(stangle);
         obj->endAngle   = float(endangle);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawEllipseInternal(x, y, stangle, endangle, xradius, yradius, bgi::gState.currentColor);
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL fillellipse(int x, int y, int xradius, int yradius)
+BGI_API void BGI_CALL fillellipse(int x, int y, int xradius, int yradius, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady() || xradius < 0 || yradius < 0)
@@ -653,14 +653,14 @@ BGI_API void BGI_CALL fillellipse(int x, int y, int xradius, int yradius)
         obj->centre = {float(x), float(y), 0.f};
         obj->rx     = float(xradius);
         obj->ry     = float(yradius);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::fillEllipseInternal(x, y, xradius, yradius, bgi::gState.fillColor);
     bgi::drawEllipseInternal(x, y, 0, 360, xradius, yradius, bgi::gState.currentColor);
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL fillpoly(int numpoints, const int *polypoints)
+BGI_API void BGI_CALL fillpoly(int numpoints, const int *polypoints, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady())
@@ -678,7 +678,7 @@ BGI_API void BGI_CALL fillpoly(int numpoints, const int *polypoints)
         auto obj   = std::make_shared<bgi::DdsFillPoly>();
         obj->style = captureStyle();
         obj->pts   = pairsToVec3(points);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::fillPolygonInternal(points, bgi::gState.fillColor);
     bgi::drawPolygonInternal(points, bgi::gState.currentColor);
@@ -1043,7 +1043,7 @@ BGI_API int BGI_CALL installuserfont(char *name)
     return fontId;
 }
 
-BGI_API void BGI_CALL line(int x1, int y1, int x2, int y2)
+BGI_API void BGI_CALL line(int x1, int y1, int x2, int y2, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady())
@@ -1055,13 +1055,13 @@ BGI_API void BGI_CALL line(int x1, int y1, int x2, int y2)
         obj->style = captureStyle();
         obj->p1    = {float(x1), float(y1), 0.f};
         obj->p2    = {float(x2), float(y2), 0.f};
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawLineInternal(x1, y1, x2, y2, bgi::gState.currentColor);
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL linerel(int dx, int dy)
+BGI_API void BGI_CALL linerel(int dx, int dy, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady())
@@ -1075,7 +1075,7 @@ BGI_API void BGI_CALL linerel(int dx, int dy)
         obj->style = captureStyle();
         obj->p1    = {float(bgi::gState.currentX), float(bgi::gState.currentY), 0.f};
         obj->p2    = {float(targetX), float(targetY), 0.f};
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawLineInternal(bgi::gState.currentX, bgi::gState.currentY, targetX, targetY, bgi::gState.currentColor);
     bgi::gState.currentX = targetX;
@@ -1083,7 +1083,7 @@ BGI_API void BGI_CALL linerel(int dx, int dy)
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL lineto(int x, int y)
+BGI_API void BGI_CALL lineto(int x, int y, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady())
@@ -1095,7 +1095,7 @@ BGI_API void BGI_CALL lineto(int x, int y)
         obj->style = captureStyle();
         obj->p1    = {float(bgi::gState.currentX), float(bgi::gState.currentY), 0.f};
         obj->p2    = {float(x), float(y), 0.f};
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawLineInternal(bgi::gState.currentX, bgi::gState.currentY, x, y, bgi::gState.currentColor);
     bgi::gState.currentX = x;
@@ -1119,7 +1119,7 @@ BGI_API void BGI_CALL moveto(int x, int y)
     bgi::gState.lastResult = bgi::grOk;
 }
 
-BGI_API void BGI_CALL outtext(char *textstring)
+BGI_API void BGI_CALL outtext(char *textstring, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady() || textstring == nullptr)
@@ -1134,7 +1134,7 @@ BGI_API void BGI_CALL outtext(char *textstring)
         obj->style = captureStyle();
         obj->pos   = {float(bgi::gState.currentX), float(bgi::gState.currentY), 0.f};
         obj->text  = text;
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     drawTextAnchored(bgi::gState.currentX, bgi::gState.currentY, text);
     const auto [width, height] = bgi::measureText(text);
@@ -1149,7 +1149,7 @@ BGI_API void BGI_CALL outtext(char *textstring)
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL outtextxy(int x, int y, char *textstring)
+BGI_API void BGI_CALL outtextxy(int x, int y, char *textstring, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady() || textstring == nullptr)
@@ -1164,13 +1164,13 @@ BGI_API void BGI_CALL outtextxy(int x, int y, char *textstring)
         obj->style = captureStyle();
         obj->pos   = {float(x), float(y), 0.f};
         obj->text  = safeStr;
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     drawTextAnchored(x, y, safeStr);
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL pieslice(int x, int y, int stangle, int endangle, int radius)
+BGI_API void BGI_CALL pieslice(int x, int y, int stangle, int endangle, int radius, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady() || radius < 0)
@@ -1185,13 +1185,13 @@ BGI_API void BGI_CALL pieslice(int x, int y, int stangle, int endangle, int radi
         obj->radius     = float(radius);
         obj->startAngle = float(stangle);
         obj->endAngle   = float(endangle);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     fillSectorShape(x, y, stangle, endangle, radius, radius, true);
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL putimage(int left, int top, void *bitmap, int op)
+BGI_API void BGI_CALL putimage(int left, int top, void *bitmap, int op, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady() || bitmap == nullptr)
@@ -1210,7 +1210,7 @@ BGI_API void BGI_CALL putimage(int left, int top, void *bitmap, int op)
         const std::size_t n = static_cast<std::size_t>(hdr->width) *
                               static_cast<std::size_t>(hdr->height);
         obj->pixels.assign(px, px + n);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     if (!bgi::drawImage(left, top, bitmap, op))
     {
@@ -1220,7 +1220,7 @@ BGI_API void BGI_CALL putimage(int left, int top, void *bitmap, int op)
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL putpixel(int x, int y, int color)
+BGI_API void BGI_CALL putpixel(int x, int y, int color, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady())
@@ -1232,13 +1232,13 @@ BGI_API void BGI_CALL putpixel(int x, int y, int color)
         obj->style = captureStyle();
         obj->pos   = {float(x), float(y), 0.f};
         obj->color = color;
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::setPixelWithMode(x, y, color, bgi::gState.writeMode);
     flushIfVisible();
 }
 
-BGI_API void BGI_CALL rectangle(int left, int top, int right, int bottom)
+BGI_API void BGI_CALL rectangle(int left, int top, int right, int bottom, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady())
@@ -1250,7 +1250,7 @@ BGI_API void BGI_CALL rectangle(int left, int top, int right, int bottom)
         obj->style = captureStyle();
         obj->p1    = {float(left), float(top), 0.f};
         obj->p2    = {float(right), float(bottom), 0.f};
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     bgi::drawLineInternal(left, top, right, top, bgi::gState.currentColor);
     bgi::drawLineInternal(right, top, right, bottom, bgi::gState.currentColor);
@@ -1279,7 +1279,7 @@ BGI_API void BGI_CALL restorecrtmode(void)
     bgi::gState.lastResult = bgi::grOk;
 }
 
-BGI_API void BGI_CALL sector(int x, int y, int stangle, int endangle, int xradius, int yradius)
+BGI_API void BGI_CALL sector(int x, int y, int stangle, int endangle, int xradius, int yradius, int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!requireReady() || xradius < 0 || yradius < 0)
@@ -1295,7 +1295,7 @@ BGI_API void BGI_CALL sector(int x, int y, int stangle, int endangle, int xradiu
         obj->ry         = float(yradius);
         obj->startAngle = float(stangle);
         obj->endAngle   = float(endangle);
-        bgi::gState.dds->append(std::move(obj));
+        bgi::appendDdsObject(std::move(obj), rb, layerName);
     }
     fillSectorShape(x, y, stangle, endangle, xradius, yradius, true);
     flushIfVisible();

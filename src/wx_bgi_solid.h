@@ -59,7 +59,8 @@ BGI_API void BGI_CALL wxbgi_solid_set_face_color(int color);
  */
 BGI_API void BGI_CALL wxbgi_solid_box(
     float cx, float cy, float cz,
-    float width, float depth, float height);
+    float width, float depth, float height,
+    int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * Draw a UV sphere centred at (cx, cy, cz).
@@ -72,7 +73,8 @@ BGI_API void BGI_CALL wxbgi_solid_box(
  */
 BGI_API void BGI_CALL wxbgi_solid_sphere(
     float cx, float cy, float cz,
-    float radius, int slices, int stacks);
+    float radius, int slices, int stacks,
+    int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * Draw a Z-aligned cylinder centred at (cx, cy, cz).
@@ -87,7 +89,8 @@ BGI_API void BGI_CALL wxbgi_solid_sphere(
 BGI_API void BGI_CALL wxbgi_solid_cylinder(
     float cx, float cy, float cz,
     float radius, float height,
-    int slices, int caps);
+    int slices, int caps,
+    int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * Draw a Z-aligned cone.  Base is at (cx, cy, cz), apex at (cx, cy, cz+height).
@@ -102,7 +105,8 @@ BGI_API void BGI_CALL wxbgi_solid_cylinder(
 BGI_API void BGI_CALL wxbgi_solid_cone(
     float cx, float cy, float cz,
     float radius, float height,
-    int slices, int cap);
+    int slices, int cap,
+    int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * Draw a torus (donut) centred at (cx, cy, cz) in the XY plane.
@@ -117,7 +121,8 @@ BGI_API void BGI_CALL wxbgi_solid_cone(
 BGI_API void BGI_CALL wxbgi_solid_torus(
     float cx, float cy, float cz,
     float major_r, float minor_r,
-    int rings, int sides);
+    int rings, int sides,
+    int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 // =============================================================================
 // Phase 5 — 3D surfaces
@@ -136,7 +141,8 @@ BGI_API void BGI_CALL wxbgi_surface_heightmap(
     float ox, float oy, float oz,
     float cell_w, float cell_h,
     int rows, int cols,
-    const float *heights);
+    const float *heights,
+    int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /**
  * Draw a parametric surface.
@@ -151,7 +157,8 @@ BGI_API void BGI_CALL wxbgi_surface_parametric(
     float cx, float cy, float cz,
     int formula,
     float param1, float param2,
-    int u_steps, int v_steps);
+    int u_steps, int v_steps,
+    int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 // =============================================================================
 // Phase 6 — 2D→3D extrusion
@@ -174,7 +181,8 @@ BGI_API void BGI_CALL wxbgi_surface_parametric(
 BGI_API void BGI_CALL wxbgi_extrude_polygon(
     const float *xs, const float *ys, int n_pts,
     float dir_x, float dir_y, float dir_z,
-    int cap_start, int cap_end);
+    int cap_start, int cap_end,
+    int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 #ifdef __cplusplus
 } // extern "C"

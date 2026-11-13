@@ -80,6 +80,12 @@ struct DdsExternalAttributes
     std::unordered_map<std::string, std::string> values;
 };
 
+struct DdsLayer
+{
+    std::string name;
+    bool visible{true};
+};
+
 // =============================================================================
 // Object type discriminator
 // =============================================================================
@@ -141,6 +147,7 @@ public:
     DdsObjectType type{DdsObjectType::Point};
     bool          visible{true};
     bool          deleted{false}; ///< Soft-delete; object stays in index.
+    std::string   layerName{"DefaultLayer"};
     DdsStyle      style;          ///< Baked draw state at creation time.
     DdsExternalAttributes externalAttributes; ///< Generic external metadata for bridge/export workflows.
 
@@ -501,7 +508,7 @@ struct DdsExtrusion : public DdsSolid3D {
 class DdsScene
 {
 public:
-    DdsScene() = default;
+    DdsScene();
     ~DdsScene() = default;
 
     // Non-copyable (scene is always accessed through gState.dds)
@@ -521,6 +528,16 @@ public:
      * if the id's numeric value exceeds the current counter.
      */
     std::shared_ptr<DdsObject> appendWithId(std::shared_ptr<DdsObject> obj);
+
+    bool createLayer(const std::string &name);
+    bool setLayerVisible(const std::string &name, bool visible);
+    void resetLayers();
+    bool deleteLayer(const std::string &name);
+    bool clearLayer(const std::string &name);
+    bool layerExists(const std::string &name) const;
+    bool layerVisible(const std::string &name) const;
+    std::vector<std::string> layerNames() const;
+    bool setObjectLayer(const std::string &id, const std::string &layerName);
 
     // -------------------------------------------------------------------------
     // Lookup
@@ -667,11 +684,15 @@ public:
     // -------------------------------------------------------------------------
     std::vector<std::string>                                    order;
     std::unordered_map<std::string, std::shared_ptr<DdsObject>> index;
+    std::unordered_map<std::string, DdsLayer>                   layers;
     uint64_t                                                    nextId{1};
     uint64_t                                                    revision{1};
 
 private:
     std::string genId() { return std::to_string(nextId++); }
 };
+
+bool appendDdsObject(std::shared_ptr<DdsObject> obj, int rb, const char *layerName);
+void renderDdsPreview(const DdsObject &obj, const glm::mat4 &transform);
 
 } // namespace bgi

@@ -37,6 +37,37 @@ Key design choices:
 
 ---
 
+## Layers and Rubber-Band Previews
+
+Each DDS scene starts with one required layer named `DefaultLayer`. Create more
+layers in the active scene with `wxbgi_dds_layer_create()`. Drawing and
+composition APIs accept trailing `rb` and `layerName` arguments:
+
+```cpp
+line(10, 10, 100, 100, false, "Geometry");       // retain on Geometry
+line(10, 20, 100, 110, true, "Geometry");        // draw only; do not retain
+const char *preview = wxbgi_dds_translate(id, 20, 0, 0, true, "Geometry");
+// preview is empty: the transformed source was rendered but not retained
+```
+
+In C++, `rb` defaults to `false` and `layerName` defaults to `nullptr` (which
+selects `DefaultLayer`), so existing C++ call sites can omit the new arguments.
+C callers must pass both arguments explicitly. For retained calls, the named
+layer must already exist in the active scene; an unknown layer sets
+`graphresult()` to `grInvalidInput` and does not add an object. Rubber-band
+draws render immediately but do not add a CHDOP object; rubber-band transforms
+and set operations render their preview and return an empty ID.
+
+Layers are scene-scoped. The layer API supports listing, assignment, clearing,
+visibility, and deletion. Clearing a layer deletes its drawing/composition
+objects but keeps the layer. Deleting a non-default layer deletes its assigned
+drawing/composition objects. `DefaultLayer` cannot be deleted. Layer visibility
+is applied during `wxbgi_render_dds()` traversal; classic immediate drawing
+continues to render directly to the active pixel buffer.
+
+Configuration nodes (cameras, UCS frames, world extents) remain on
+`DefaultLayer`; layer assignment is for drawable and composition objects.
+
 ## Core DDS Functions
 
 ### Scene Inspection
@@ -52,6 +83,13 @@ Key design choices:
 | `wxbgi_dds_find_by_label(label)` | Look up an object ID by its label. |
 | `wxbgi_dds_set_visible(id, visible)` | Show / hide an individual object without deleting it. |
 | `wxbgi_dds_get_visible(id)` | Returns 1 if visible, 0 if hidden. |
+| `wxbgi_dds_get_layer(id)` / `wxbgi_dds_set_layer(id, name)` | Get or change a drawable/composition object's layer. |
+| `wxbgi_dds_layer_create(name)` | Create a layer in the active DDS scene. |
+| `wxbgi_dds_layer_count()` / `wxbgi_dds_layer_get_name_at(index)` | List the active scene's layers in sorted name order. |
+| `wxbgi_dds_layer_exists(name)` | Check whether a layer exists in the active scene. |
+| `wxbgi_dds_layer_set_visible(name, visible)` / `wxbgi_dds_layer_get_visible(name)` | Temporarily hide/show a layer for retained rendering. |
+| `wxbgi_dds_layer_clear(name)` | Delete drawing/composition objects assigned to the layer without deleting the layer. |
+| `wxbgi_dds_layer_delete(name)` | Delete a non-default layer and its drawing/composition objects. |
 
 ### External Metadata
 
@@ -71,7 +109,7 @@ Key design choices:
 | `wxbgi_dds_remove(id)` | Remove one object by ID. |
 | `wxbgi_dds_clear()` | Remove all drawing objects; keeps cameras and UCS frames. |
 | `wxbgi_dds_clear_all()` | Remove every object including cameras and UCS frames. |
-| `wxbgi_dds_translate(id, dx, dy, dz)` | Create a retained Transform node that references `id` and replays it with a translation offset. |
+| `wxbgi_dds_translate(id, dx, dy, dz, rb, layerName)` | Create a retained Transform node that references `id` and replays it with a translation offset, or render an unretained preview when `rb` is true. |
 | `wxbgi_dds_rotate_*()` | Create retained Transform nodes for X/Y/Z or arbitrary-axis rotation in degrees or radians. |
 | `wxbgi_dds_scale_uniform()` / `wxbgi_dds_scale_xyz()` | Create retained Transform nodes for uniform or per-axis scaling. |
 | `wxbgi_dds_skew()` | Create a retained Transform node from six 3D shear factors. |
@@ -520,6 +558,7 @@ DDJ/DDY files produced by `wxbgi_dds_save_json()` and `wxbgi_dds_save_yaml()` no
 include a `"scenes"` top-level key that lists every named scene graph, and each
 camera node carries a `"scene"` field recording its `assignedSceneName`.
 
-**Backward compatibility:** Old DDJ/DDY files that do not have a `"scenes"` key
-load cleanly — all objects are placed into the `"default"` scene and all cameras
-are assigned to `"default"`.
+**Backward compatibility:** Old DDJ/DDY files that do not have a `"scenes"` or
+`"layers"` key load cleanly — objects use `DefaultLayer`, and all cameras are
+assigned to `"default"`. New files preserve per-scene layer names and
+visibility, as well as each object's layer membership.

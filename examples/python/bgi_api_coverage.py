@@ -35,19 +35,36 @@ def require(condition: bool, message: str) -> None:
 
 def configure_prototypes(lib):
     WxbgiFrameCallback = ctypes.CFUNCTYPE(None)
-    lib.arc.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
-    lib.bar.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
-    lib.bar3d.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
-    lib.circle.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int]
+    draw_prototypes = {
+        "arc": [ctypes.c_int] * 5,
+        "bar": [ctypes.c_int] * 4,
+        "bar3d": [ctypes.c_int] * 6,
+        "circle": [ctypes.c_int] * 3,
+        "drawpoly": [ctypes.c_int, ctypes.POINTER(ctypes.c_int)],
+        "ellipse": [ctypes.c_int] * 6,
+        "fillellipse": [ctypes.c_int] * 4,
+        "fillpoly": [ctypes.c_int, ctypes.POINTER(ctypes.c_int)],
+        "line": [ctypes.c_int] * 4,
+        "linerel": [ctypes.c_int] * 2,
+        "lineto": [ctypes.c_int] * 2,
+        "outtext": [ctypes.c_char_p],
+        "outtextxy": [ctypes.c_int, ctypes.c_int, ctypes.c_char_p],
+        "pieslice": [ctypes.c_int] * 5,
+        "putimage": [ctypes.c_int, ctypes.c_int, ctypes.c_void_p, ctypes.c_int],
+        "putpixel": [ctypes.c_int] * 3,
+        "rectangle": [ctypes.c_int] * 4,
+        "sector": [ctypes.c_int] * 6,
+    }
+    draw_functions = {}
+    for name, prototype in draw_prototypes.items():
+        function = getattr(lib, name)
+        function.argtypes = [*prototype, ctypes.c_int, ctypes.c_char_p]
+        draw_functions[name] = function
     lib.cleardevice.argtypes = []
     lib.clearviewport.argtypes = []
     lib.closegraph.argtypes = []
     lib.delay.argtypes = [ctypes.c_int]
     lib.detectgraph.argtypes = [ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)]
-    lib.drawpoly.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
-    lib.ellipse.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
-    lib.fillellipse.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
-    lib.fillpoly.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
     lib.floodfill.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int]
     lib.getactivepage.restype = ctypes.c_int
     lib.getarccoords.argtypes = [ctypes.POINTER(ArcCoords)]
@@ -94,23 +111,13 @@ def configure_prototypes(lib):
     lib.installuserdriver.restype = ctypes.c_int
     lib.installuserfont.argtypes = [ctypes.c_char_p]
     lib.installuserfont.restype = ctypes.c_int
-    lib.line.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
-    lib.linerel.argtypes = [ctypes.c_int, ctypes.c_int]
-    lib.lineto.argtypes = [ctypes.c_int, ctypes.c_int]
     lib.moverel.argtypes = [ctypes.c_int, ctypes.c_int]
     lib.moveto.argtypes = [ctypes.c_int, ctypes.c_int]
-    lib.outtext.argtypes = [ctypes.c_char_p]
-    lib.outtextxy.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_char_p]
-    lib.pieslice.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
-    lib.putimage.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_void_p, ctypes.c_int]
-    lib.putpixel.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int]
-    lib.rectangle.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
     lib.registerbgidriver.argtypes = [WxbgiFrameCallback]
     lib.registerbgidriver.restype = ctypes.c_int
     lib.registerbgifont.argtypes = [WxbgiFrameCallback]
     lib.registerbgifont.restype = ctypes.c_int
     lib.restorecrtmode.argtypes = []
-    lib.sector.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
     lib.setactivepage.argtypes = [ctypes.c_int]
     lib.setallpalette.argtypes = [ctypes.POINTER(PaletteType)]
     lib.setaspectratio.argtypes = [ctypes.c_int, ctypes.c_int]
@@ -172,6 +179,17 @@ def configure_prototypes(lib):
     lib.wxbgi_wx_set_frame_rate.argtypes = [ctypes.c_int]
     lib.wxbgi_wx_refresh.argtypes = []
     lib.wxbgi_wx_set_idle_callback.argtypes = [WxbgiFrameCallback]
+    for name, function in draw_functions.items():
+        argument_count = len(draw_prototypes[name])
+
+        def draw(*args, rb=False, layer_name=None, function=function, argument_count=argument_count):
+            if len(args) == argument_count + 2:
+                args, rb, layer_name = args[:-2], args[-2], args[-1]
+            elif len(args) == argument_count + 1:
+                args, rb = args[:-1], args[-1]
+            return function(*args, int(rb), layer_name)
+
+        setattr(lib, name, draw)
     return WxbgiFrameCallback
 
 
@@ -245,7 +263,7 @@ def main() -> int:
     lib.rectangle(0, 0, lib.getmaxx(), lib.getmaxy())
     lib.setlinestyle(3, 0xF0F0, 3)
     lib.moveto(20, 20)
-    lib.line(20, 20, 200, 60)
+    lib.line(20, 20, 200, 60, 1, b"DefaultLayer")
     lib.lineto(260, 120)
     lib.linerel(40, 30)
     lib.moverel(-20, 30)

@@ -120,7 +120,8 @@ void renderAndFlush(const bgi::DdsObject &obj)
 // =============================================================================
 
 BGI_API void BGI_CALL wxbgi_solid_box(float cx, float cy, float cz,
-                                       float width, float depth, float height)
+                                       float width, float depth, float height,
+                                       int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!bgi::isReady()) return;
@@ -131,12 +132,13 @@ BGI_API void BGI_CALL wxbgi_solid_box(float cx, float cy, float cz,
     obj->width  = width;
     obj->depth  = depth;
     obj->height = height;
-    bgi::gState.dds->append(obj);
+    bgi::appendDdsObject(obj, rb, layerName);
     renderAndFlush(*obj);
 }
 
 BGI_API void BGI_CALL wxbgi_solid_sphere(float cx, float cy, float cz,
-                                          float radius, int slices, int stacks)
+                                          float radius, int slices, int stacks,
+                                          int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!bgi::isReady()) return;
@@ -147,13 +149,14 @@ BGI_API void BGI_CALL wxbgi_solid_sphere(float cx, float cy, float cz,
     obj->radius = radius;
     obj->slices = slices;
     obj->stacks = stacks;
-    bgi::gState.dds->append(obj);
+    bgi::appendDdsObject(obj, rb, layerName);
     renderAndFlush(*obj);
 }
 
 BGI_API void BGI_CALL wxbgi_solid_cylinder(float cx, float cy, float cz,
                                             float radius, float height,
-                                            int slices, int caps)
+                                            int slices, int caps,
+                                            int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!bgi::isReady()) return;
@@ -165,13 +168,14 @@ BGI_API void BGI_CALL wxbgi_solid_cylinder(float cx, float cy, float cz,
     obj->height = height;
     obj->slices = slices;
     obj->caps   = caps;
-    bgi::gState.dds->append(obj);
+    bgi::appendDdsObject(obj, rb, layerName);
     renderAndFlush(*obj);
 }
 
 BGI_API void BGI_CALL wxbgi_solid_cone(float cx, float cy, float cz,
                                         float radius, float height,
-                                        int slices, int cap)
+                                        int slices, int cap,
+                                        int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!bgi::isReady()) return;
@@ -183,13 +187,14 @@ BGI_API void BGI_CALL wxbgi_solid_cone(float cx, float cy, float cz,
     obj->height = height;
     obj->slices = slices;
     obj->cap    = cap;
-    bgi::gState.dds->append(obj);
+    bgi::appendDdsObject(obj, rb, layerName);
     renderAndFlush(*obj);
 }
 
 BGI_API void BGI_CALL wxbgi_solid_torus(float cx, float cy, float cz,
                                          float major_r, float minor_r,
-                                         int rings, int sides)
+                                         int rings, int sides,
+                                         int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!bgi::isReady()) return;
@@ -201,7 +206,7 @@ BGI_API void BGI_CALL wxbgi_solid_torus(float cx, float cy, float cz,
     obj->minorRadius = minor_r;
     obj->slices      = rings;  // rings = slices
     obj->stacks      = sides;  // sides = stacks
-    bgi::gState.dds->append(obj);
+    bgi::appendDdsObject(obj, rb, layerName);
     renderAndFlush(*obj);
 }
 
@@ -212,7 +217,8 @@ BGI_API void BGI_CALL wxbgi_solid_torus(float cx, float cy, float cz,
 BGI_API void BGI_CALL wxbgi_surface_heightmap(float ox, float oy, float oz,
                                                float cell_w, float cell_h,
                                                int rows, int cols,
-                                               const float *heights)
+                                               const float *heights,
+                                               int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!bgi::isReady()) return;
@@ -226,14 +232,15 @@ BGI_API void BGI_CALL wxbgi_surface_heightmap(float ox, float oy, float oz,
     obj->cellWidth  = cell_w;
     obj->cellHeight = cell_h;
     obj->heights.assign(heights, heights + rows * cols);
-    bgi::gState.dds->append(obj);
+    bgi::appendDdsObject(obj, rb, layerName);
     renderAndFlush(*obj);
 }
 
 BGI_API void BGI_CALL wxbgi_surface_parametric(float cx, float cy, float cz,
                                                 int formula,
                                                 float param1, float param2,
-                                                int u_steps, int v_steps)
+                                                int u_steps, int v_steps,
+                                                int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!bgi::isReady()) return;
@@ -246,7 +253,7 @@ BGI_API void BGI_CALL wxbgi_surface_parametric(float cx, float cy, float cz,
     obj->param2  = param2;
     obj->uSteps  = std::max(2, u_steps);
     obj->vSteps  = std::max(2, v_steps);
-    bgi::gState.dds->append(obj);
+    bgi::appendDdsObject(obj, rb, layerName);
     renderAndFlush(*obj);
 }
 
@@ -257,7 +264,8 @@ BGI_API void BGI_CALL wxbgi_surface_parametric(float cx, float cy, float cz,
 BGI_API void BGI_CALL wxbgi_extrude_polygon(const float *xs, const float *ys,
                                              int n_pts,
                                              float dir_x, float dir_y, float dir_z,
-                                             int cap_start, int cap_end)
+                                             int cap_start, int cap_end,
+                                             int rb, const char *layerName)
 {
     std::lock_guard<std::mutex> lock(bgi::gMutex);
     if (!bgi::isReady()) return;
@@ -271,6 +279,6 @@ BGI_API void BGI_CALL wxbgi_extrude_polygon(const float *xs, const float *ys,
     obj->baseProfile.reserve(n_pts);
     for (int i = 0; i < n_pts; ++i)
         obj->baseProfile.emplace_back(xs[i], ys[i], 0.f);
-    bgi::gState.dds->append(obj);
+    bgi::appendDdsObject(obj, rb, layerName);
     renderAndFlush(*obj);
 }

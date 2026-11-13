@@ -592,15 +592,16 @@ BGI_API int BGI_CALL wxbgi_ucs_to_screen(const char *ucsName, const char *camNam
 
 /** @brief Draws a single pixel at a world-space position.
  *  @param x,y,z  World-space position.  @param color  BGI colour index. */
-BGI_API void BGI_CALL wxbgi_world_point(float x, float y, float z, int color);
+BGI_API void BGI_CALL wxbgi_world_point(float x, float y, float z, int color, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws a line segment between two world-space points using the current colour/style. */
 BGI_API void BGI_CALL wxbgi_world_line(float x1, float y1, float z1,
-                                        float x2, float y2, float z2);
+                                        float x2, float y2, float z2,
+                                        int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws a circle (world-space centre, world-unit radius) via the active camera.
  *  The screen radius is estimated from a radial offset along world-X. */
-BGI_API void BGI_CALL wxbgi_world_circle(float cx, float cy, float cz, float radius);
+BGI_API void BGI_CALL wxbgi_world_circle(float cx, float cy, float cz, float radius, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws an ellipse arc (world-space centre, world-unit semi-axes rx/ry).
  *  @param cx          World-space X coordinate of the ellipse centre.
@@ -612,49 +613,56 @@ BGI_API void BGI_CALL wxbgi_world_circle(float cx, float cy, float cz, float rad
  *  @param endAngle    Arc end angle in degrees. */
 BGI_API void BGI_CALL wxbgi_world_ellipse(float cx, float cy, float cz,
                                            float rx, float ry,
-                                           int startAngle, int endAngle);
+                                           int startAngle, int endAngle,
+                                           int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws a screen-space rectangle outline from two projected world-space corners. */
 BGI_API void BGI_CALL wxbgi_world_rectangle(float x1, float y1, float z1,
-                                             float x2, float y2, float z2);
+                                             float x2, float y2, float z2,
+                                             int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws an open polyline through world-space points.
  *  @param xyzTriplets  Flat (x,y,z) array; length = pointCount*3.
  *  @param pointCount   Number of points represented in @p xyzTriplets. */
-BGI_API void BGI_CALL wxbgi_world_polyline(const float *xyzTriplets, int pointCount);
+BGI_API void BGI_CALL wxbgi_world_polyline(const float *xyzTriplets, int pointCount, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws and fills a closed polygon through world-space points.
  *  Points behind the camera are dropped; needs >= 3 visible vertices. */
-BGI_API void BGI_CALL wxbgi_world_fillpoly(const float *xyzTriplets, int pointCount);
+BGI_API void BGI_CALL wxbgi_world_fillpoly(const float *xyzTriplets, int pointCount, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws text at a world-space position using current BGI font/colour settings. */
-BGI_API void BGI_CALL wxbgi_world_outtextxy(float x, float y, float z, const char *text);
+BGI_API void BGI_CALL wxbgi_world_outtextxy(float x, float y, float z, const char *text, int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 // --- UCS-local drawing (transform through named UCS, then project) -----------
 
 /** @brief Draws a pixel at a UCS-local position.  NULL ucsName = active UCS. */
 BGI_API void BGI_CALL wxbgi_ucs_point(const char *ucsName,
-                                       float ux, float uy, float uz, int color);
+                                       float ux, float uy, float uz, int color,
+                                       int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws a line between two UCS-local points.  NULL ucsName = active UCS. */
 BGI_API void BGI_CALL wxbgi_ucs_line(const char *ucsName,
                                       float ux1, float uy1, float uz1,
-                                      float ux2, float uy2, float uz2);
+                                      float ux2, float uy2, float uz2,
+                                      int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws a circle at a UCS-local centre with a UCS-unit radius.  NULL ucsName = active UCS. */
 BGI_API void BGI_CALL wxbgi_ucs_circle(const char *ucsName,
-                                        float cx, float cy, float cz, float radius);
+                                        float cx, float cy, float cz, float radius,
+                                        int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws an open polyline through UCS-local points.  NULL ucsName = active UCS.
  *  @param ucsName      UCS name, or NULL for the active UCS.
  *  @param xyzTriplets  Flat (x,y,z) array in UCS local space.
  *  @param pointCount   Number of points represented in @p xyzTriplets. */
 BGI_API void BGI_CALL wxbgi_ucs_polyline(const char *ucsName,
-                                          const float *xyzTriplets, int pointCount);
+                                          const float *xyzTriplets, int pointCount,
+                                          int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @brief Draws text at a UCS-local anchor.  NULL ucsName = active UCS. */
 BGI_API void BGI_CALL wxbgi_ucs_outtextxy(const char *ucsName,
                                            float ux, float uy, float uz,
-                                           const char *text);
+                                           const char *text,
+                                           int rb BGI_DEFAULT_ARG(0), const char *layerName BGI_DEFAULT_ARG(nullptr));
 
 /** @} */

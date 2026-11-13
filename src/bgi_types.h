@@ -20,6 +20,12 @@
 #define BGI_CALL
 #endif
 
+#ifdef __cplusplus
+#define BGI_DEFAULT_ARG(value) = value
+#else
+#define BGI_DEFAULT_ARG(value)
+#endif
+
 struct GLFWwindow;
 
 /**

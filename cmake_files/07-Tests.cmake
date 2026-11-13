@@ -39,13 +39,19 @@ if(BUILD_TESTING)
         add_test(NAME test_dds_clear         COMMAND $<TARGET_FILE:test_dds_clear>)
         set_tests_properties(test_dds_clear         PROPERTIES TIMEOUT 90)
 
+        add_test(NAME test_dds_layers        COMMAND $<TARGET_FILE:test_dds_layers>)
+        set_tests_properties(test_dds_layers        PROPERTIES TIMEOUT 90)
+
+        add_test(NAME wxbgi_rubberband_demo COMMAND $<TARGET_FILE:wxbgi_rubberband_demo>)
+        set_tests_properties(wxbgi_rubberband_demo PROPERTIES TIMEOUT 15)
+
         add_test(NAME test_dds_cam2d_yz      COMMAND $<TARGET_FILE:test_dds_cam2d_yz>)
-        set_tests_properties(test_dds_cam2d_yz      PROPERTIES TIMEOUT 90)
+        set_tests_properties(test_dds_cam2d_yz PROPERTIES TIMEOUT 90)
 
         add_test(NAME test_dds_csg           COMMAND $<TARGET_FILE:test_dds_csg>)
         set_tests_properties(test_dds_csg           PROPERTIES TIMEOUT 90)
 
-        # Demo executables stay out of CTest; keep only deterministic automation targets here.
+        # Keep interactive demos out of CTest; register only bounded smoke demos.
         add_test(NAME test_field_vis COMMAND $<TARGET_FILE:test_field_vis>)
         set_tests_properties(test_field_vis PROPERTIES TIMEOUT 90)
 
