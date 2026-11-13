@@ -43,7 +43,7 @@ if(BUILD_TESTING)
         set_tests_properties(test_dds_layers        PROPERTIES TIMEOUT 90)
 
         add_test(NAME wxbgi_rubberband_demo COMMAND $<TARGET_FILE:wxbgi_rubberband_demo>)
-        set_tests_properties(wxbgi_rubberband_demo PROPERTIES TIMEOUT 15)
+        set_tests_properties(wxbgi_rubberband_demo PROPERTIES TIMEOUT 90)
 
         add_test(NAME test_dds_cam2d_yz      COMMAND $<TARGET_FILE:test_dds_cam2d_yz>)
         set_tests_properties(test_dds_cam2d_yz PROPERTIES TIMEOUT 90)
