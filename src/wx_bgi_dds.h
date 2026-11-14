@@ -70,6 +70,7 @@
 #define WXBGI_DDS_SET_DIFFERENCE 29
 #define WXBGI_DDS_UNKNOWN        -1
 
+
 // Parametric surface formula constants
 #define WXBGI_PARAM_SPHERE    0
 #define WXBGI_PARAM_CYLINDER  1
@@ -91,6 +92,43 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+enum class DDSPrimitives {
+    DDS_CAMERA,
+    DDS_UCS,
+    DDS_WORLD_EXTENTS,
+    DDS_POINT,
+    DDS_LINE,
+    DDS_CIRCLE,
+    DDS_ARC,
+    DDS_ELLIPSE,
+    DDS_FILL_ELLIPSE,
+    DDS_PIE_SLICE,
+    DDS_SECTOR,
+    DDS_RECTANGLE,
+    DDS_BAR,
+    DDS_BAR3D,
+    DDS_POLYGON,
+    DDS_FILL_POLY,
+    DDS_TEXT,
+    DDS_IMAGE,
+    // Phase 4 — 3D Solid Primitives
+    DDS_BOX,
+    DDS_SPHERE,
+    DDS_CYLINDER,
+    DDS_CONE,
+    DDS_TORUS,
+    // Phase 5 — 3D Surfaces
+    DDS_HEIGHTMAP,
+    DDS_PARAM_SURFACE,
+    // Phase 6 — 2D→3D Extrusion
+    DDS_EXTRUSION,
+    DDS_TRANSFORM,
+    DDS_SET_UNION,
+    DDS_SET_INTERSECTION,
+    DDS_SET_DIFFERENCE,
+    DDS_UNKNOWN
+}
 
 // =============================================================================
 // Scene inspection and management

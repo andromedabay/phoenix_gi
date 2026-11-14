@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "EnumLookup.h"
 
 #if defined(_WIN32)
 #define BGI_API extern "C" __declspec(dllexport)
